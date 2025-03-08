@@ -2,104 +2,242 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ダメージ計算＆DPSツール</title>
   <style>
-    html, body { height: 95%; margin: 10; padding: 10; }
-    .container { display: flex; flex-direction: column; height: 95vh; }
-    #scrollable-content { flex: 1; overflow-y: auto; padding: 10px; min-height: 0; }
-    #graph-container { height: 50vh !important; width: 100%; overflow: hidden; }
-    #damageGraph { height: 50vh !important; }
-    table { 
-      border-collapse: collapse; 
-      width: 100%;
-      table-layout: fixed;
-    }
-    th, td { 
-      border: 1px solid #e0e0e0;
-      padding: 8px; 
-      text-align: left;
-      white-space: normal;
-      overflow: visible;
-    }
-    /* 武器MODのセルは特別処理 */
-    tr.category-mod td {
-      white-space: normal;
-      overflow: visible;
-    }
-    th {
-      width: 200px;
-      background-color: #f2f2f2;
-    }
-    td {
-      width: calc(100% - 200px);
-    }
-    input[type="number"]:not([readonly]), select:not([readonly]), input[type="checkbox"]:not([readonly]) { 
-      background-color: #ffffcc; 
-    }
-    input[type="number"], input[type="text"] { 
-      width: 60px; 
+    html, body { 
+      margin: 0; 
+      padding: 0; 
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
     }
     
-    /* ボタンのスタイルを統一 */
+    .container { 
+      padding: 10px; 
+      max-width: 100%;
+    }
+
+    #scrollable-content { 
+      margin-bottom: 33vh; 
+    }
+
+    table { 
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+
+    th, td { 
+      padding: 10px;
+      border: 1px solid #e0e0e0;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      white-space: normal;
+      width: 40%;
+    }
+
+    td {
+      width: 60%;
+    }
+
+    /* 入力フィールドのスタイル */
+    input[type="number"], 
+    input[type="text"],
+    select { 
+      width: 70px;
+      height: 30px;
+      font-size: 1rem;
+      padding: 5px;
+      margin: 2px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    /* ボタンのスタイル */
     button {
-      padding: 8px 16px;
-      border: 1px solid #d0d0d0;
-      border-radius: 3px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-size: 1em;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      min-width: 80px;
-      height: 40px;
-      margin: 2px 3px;  /* 上下左右の余白を設定 */
+      min-width: 120px;
+      height: 44px;
+      margin: 5px;
+      padding: 10px 15px;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 8px;
       background-color: #f5f5f5;
       color: #505050;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+
     button.on {
       background-color: #2196F3;
       color: white;
-      border-color: #1976D2;
-      font-weight: 500;
     }
-    button.off {
-      background-color: #f5f5f5;
-      color: #505050;
-    }
-    button:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
+
+    button:active {
+      transform: scale(0.98);
     }
 
     /* カテゴリごとの背景色 */
-    tr.category-target th { background-color: #E3F2FD; }  /* 攻撃対象・攻撃部位用の薄い青 */
+    tr.category-target th { background-color: #E3F2FD; }
     tr.category-weapon th,
-    tr.category-mod th { background-color: #E8F5E9; }  /* 武器と武器MODを同じ色に */
+    tr.category-mod th { background-color: #E8F5E9; }
     tr.category-legendary th { background-color: #FFF3E0; }
     tr.category-perk th { background-color: #F3E5F5; }
     tr.category-mutation th { background-color: #E8EAF6; }
     tr.category-buff th { background-color: #FBE9E7; }
 
-    /* 右列（td）は通常の背景色に戻す */
-    tr.category-target td,
-    tr.category-weapon td,
-    tr.category-mod td,
-    tr.category-legendary td,
-    tr.category-perk td,
-    tr.category-mutation td,
-    tr.category-buff td { background-color: white; }
-
-    /* 言語切り替えボタン用のスタイル */
+    /* 言語切り替えボタン */
     .language-switcher {
-      text-align: right;
       padding: 10px;
+      text-align: right;
+      background-color: white;
     }
+
     .language-switcher button {
+      min-width: 80px;
+      height: 36px;
       background-color: #90EE90;
-      color: black;
     }
+
     .language-switcher button.active {
       background-color: #32CD32;
-      border: 2px solid #fff;
+      color: white;
+    }
+
+    /* グラフコンテナ */
+    #graph-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 33vh;
+      background-color: white;
+      padding: 10px;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+
+    #damageGraph {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ボタングループのラッパー */
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      justify-content: flex-start;
+      margin: 5px 0;
+    }
+
+    /* 数値表示セクション */
+    .damage-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .damage-display span {
+      margin: 0 5px;
+    }
+
+    /* PC向けスタイル */
+    @media (min-width: 1024px) {
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      button {
+        min-width: 150px;
+        font-size: 1rem;
+      }
+
+      th, td {
+        font-size: 1rem;
+        padding: 12px;
+      }
+
+      input[type="number"], 
+      input[type="text"],
+      select {
+        width: 80px;
+        height: 32px;
+      }
+
+      #graph-container {
+        position: relative;
+        height: 400px;
+        margin-top: 20px;
+      }
+
+      #scrollable-content {
+        margin-bottom: 0;
+      }
+
+      .damage-display {
+        gap: 8px;
+      }
+
+      .damage-display span {
+        margin: 0 8px;
+      }
+    }
+
+    /* モバイル向けスタイル */
+    @media (max-width: 480px) {
+      th, td {
+        padding: 8px;
+        font-size: 0.85rem;
+      }
+
+      button {
+        min-width: 100px;
+        height: 40px;
+        font-size: 0.85rem;
+        padding: 8px 12px;
+      }
+
+      input[type="number"], 
+      input[type="text"],
+      select {
+        width: 60px;
+        height: 28px;
+        font-size: 0.9rem;
+      }
+
+      .damage-display {
+        gap: 3px;
+      }
+
+      .damage-display span {
+        margin: 0 3px;
+      }
+    }
+
+    /* スクロールバーのカスタマイズ */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
     }
   </style>
 </head>
@@ -876,8 +1014,34 @@
     }
 
     window.onload = function() {
+      // デバイスタイプの検出とタイトル更新
+      function updateTitle() {
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        document.title = `ダメージ計算＆DPSツール${isMobile ? '（モバイル版）' : ''}`;
+      }
+      
+      // 初期化時にタイトルを更新
+      updateTitle();
+      
+      // 画面回転時にもタイトルを更新
+      window.addEventListener('orientationchange', updateTitle);
+      
       // 初期言語を適用
       switchLanguage(currentLang);
+      
+      // モバイル向けの追加処理
+      if ('ontouchstart' in window) {
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+          button.addEventListener('touchstart', function() {
+            this.classList.add('touch');
+          }, false);
+          
+          button.addEventListener('touchend', function() {
+            this.classList.remove('touch');
+          }, false);
+        });
+      }
       
       updateButtons();
       calculateDamage();
