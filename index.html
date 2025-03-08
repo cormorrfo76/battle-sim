@@ -9,24 +9,98 @@
     #scrollable-content { flex: 1; overflow-y: auto; padding: 10px; min-height: 0; }
     #graph-container { height: 50vh !important; width: 100%; overflow: hidden; }
     #damageGraph { height: 50vh !important; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid black; padding: 8px; text-align: left; }
-    th { background-color: #f2f2f2; }
-    input[type="number"]:not([readonly]), select:not([readonly]), input[type="checkbox"]:not([readonly]) { background-color: #ffffcc; }
-    input[type="number"], input[type="text"] { width: 60px; }
-    button { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.05s ease; font-size: 1em; box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); min-width: 80px; height: 40px; margin-right: 5px; }
-    button.on { background-color: #008000; color: white; }
-    button.off { background-color: #DDDDDD; color: black; }
-    button:hover { opacity: 0.8; }
-    button.weapon { background-color: #87CEEB; color: black; }
-    button.weapon.on { background-color: #0000FF; color: white; }
-    button.weaponMod { background-color: #87CEEB; color: black; }
-    button.weaponMod.on { background-color: #0000FF; color: white; }
-    button.legendary.on { background-color: #FFA500; color: white; }
+    table { 
+      border-collapse: collapse; 
+      width: 100%;
+      table-layout: fixed;
+    }
+    th, td { 
+      border: 1px solid #e0e0e0;
+      padding: 8px; 
+      text-align: left;
+      white-space: normal;
+      overflow: visible;
+    }
+    /* 武器MODのセルは特別処理 */
+    tr.category-mod td {
+      white-space: normal;
+      overflow: visible;
+    }
+    th {
+      width: 200px;
+      background-color: #f2f2f2;
+    }
+    td {
+      width: calc(100% - 200px);
+    }
+    input[type="number"]:not([readonly]), select:not([readonly]), input[type="checkbox"]:not([readonly]) { 
+      background-color: #ffffcc; 
+    }
+    input[type="number"], input[type="text"] { 
+      width: 60px; 
+    }
+    
+    /* ボタンのスタイルを統一 */
+    button {
+      padding: 8px 16px;
+      border: 1px solid #d0d0d0;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 1em;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      min-width: 80px;
+      height: 40px;
+      margin: 2px 4px;  /* 上下左右の余白を設定 */
+      background-color: #f5f5f5;
+      color: #505050;
+    }
+    button.on {
+      background-color: #2196F3;
+      color: white;
+      border-color: #1976D2;
+      font-weight: 500;
+    }
+    button.off {
+      background-color: #f5f5f5;
+      color: #505050;
+    }
+    button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    /* カテゴリごとの背景色 */
+    tr.category-target th { background-color: #E3F2FD; }  /* 攻撃対象・攻撃部位用の薄い青 */
+    tr.category-weapon th,
+    tr.category-mod th { background-color: #E8F5E9; }  /* 武器と武器MODを同じ色に */
+    tr.category-legendary th { background-color: #FFF3E0; }
+    tr.category-perk th { background-color: #F3E5F5; }
+    tr.category-mutation th { background-color: #E8EAF6; }
+    tr.category-buff th { background-color: #FBE9E7; }
+
+    /* 右列（td）は通常の背景色に戻す */
+    tr.category-target td,
+    tr.category-weapon td,
+    tr.category-mod td,
+    tr.category-legendary td,
+    tr.category-perk td,
+    tr.category-mutation td,
+    tr.category-buff td { background-color: white; }
+
     /* 言語切り替えボタン用のスタイル */
-    .language-switcher { text-align: right; padding: 10px; }
-    .language-switcher button { background-color: #4CAF50; color: white; }
-    .language-switcher button.active { background-color: #45a049; border: 2px solid #fff; }
+    .language-switcher {
+      text-align: right;
+      padding: 10px;
+    }
+    .language-switcher button {
+      background-color: #90EE90;
+      color: black;
+    }
+    .language-switcher button.active {
+      background-color: #32CD32;
+      border: 2px solid #fff;
+    }
   </style>
 </head>
 <body>
@@ -45,34 +119,34 @@
         </thead>
         <tbody>
           <tr><th data-lang-key="preset">プリセット</th><td><select id="presetSelect" onchange="applyPreset()"><option value="default" data-lang-key="defaultPreset">デフォルト</option><option value="preset1" data-lang-key="preset1">プリセット1</option><option value="preset2" data-lang-key="preset2">プリセット2</option></select></td></tr>
-          <tr><th data-lang-key="target">攻撃対象</th><td><button id="ultraciteTerrorButton" class="on" onclick="toggleExclusiveBonus('ultraciteTerror')" data-lang-key="ultraciteTerror">ウルトラサイトテラー</button><button id="en06Button" class="off" onclick="toggleExclusiveBonus('en06')">EN06</button></td></tr>
-          <tr><th data-lang-key="bodyPart">攻撃部位</th><td><button id="eyeButton" class="on" onclick="toggleExclusiveBonus('eye')" data-lang-key="eye">目</button><button id="headButton" class="off" onclick="toggleExclusiveBonus('head')" data-lang-key="head">頭</button><button id="bodyButton" class="off" onclick="toggleExclusiveBonus('body')" data-lang-key="body">胴体</button></td></tr>
-          <tr>
+          <tr class="category-target"><th data-lang-key="target">攻撃対象</th><td><button id="ultraciteTerrorButton" class="on" onclick="toggleExclusiveBonus('ultraciteTerror')" data-lang-key="ultraciteTerror">ウルトラサイトテラー</button><button id="en06Button" class="off" onclick="toggleExclusiveBonus('en06')">EN06</button></td></tr>
+          <tr class="category-target"><th data-lang-key="bodyPart">攻撃部位</th><td><button id="eyeButton" class="on" onclick="toggleExclusiveBonus('eye')" data-lang-key="eye">目</button><button id="headButton" class="off" onclick="toggleExclusiveBonus('head')" data-lang-key="head">頭</button><button id="bodyButton" class="off" onclick="toggleExclusiveBonus('body')" data-lang-key="body">胴体</button></td></tr>
+          <tr class="category-weapon">
             <th data-lang-key="weapon">武器</th>
             <td>
-              <button id="gatPlasmaButton" class="on weapon" onclick="toggleWeapon('gatPlasma')" data-lang-key="gatPlasma">ガトプラ</button>
-              <button id="railRifleButton" class="off weapon" onclick="toggleWeapon('railRifle')" data-lang-key="railRifle">レールライフル</button>
+              <button id="gatPlasmaButton" class="on" onclick="toggleWeapon('gatPlasma')" data-lang-key="gatPlasma">ガトプラ</button>
+              <button id="railRifleButton" class="off" onclick="toggleWeapon('railRifle')" data-lang-key="railRifle">レールライフル</button>
             </td>
           </tr>
-          <tr>
+          <tr class="category-mod">
             <th data-lang-key="weaponMod">武器MOD</th>
             <td>
               <span id="gatPlasmaMods" style="display: inline;">
-                <button id="stingingCoreButton" class="on weaponMod" onclick="toggleBonus('stingingCore')" data-lang-key="stingingCore">スティングコア</button>
-                <button id="swiftCoreButton" class="off weaponMod" onclick="toggleExclusiveBonus('swiftCore')" data-lang-key="swiftCore">スウィフトコア</button>
-                <button id="primeButton" class="off weaponMod" onclick="toggleExclusiveBonus('prime')" data-lang-key="prime">プライムレシーバー</button>
-                <button id="calibrateButton" class="on weaponMod" onclick="toggleExclusiveBonus('calibrate')" data-lang-key="calibrate">キャリブレートレシーバー</button>
-                <button id="acceralateButton" class="on weaponMod" onclick="toggleBonus('acceralate')" data-lang-key="acceralate">アクセラレートノズル</button>
+                <button id="stingingCoreButton" class="on" onclick="toggleBonus('stingingCore')" data-lang-key="stingingCore">スティングコア</button>
+                <button id="swiftCoreButton" class="off" onclick="toggleExclusiveBonus('swiftCore')" data-lang-key="swiftCore">スウィフトコア</button>
+                <button id="primeButton" class="off" onclick="toggleExclusiveBonus('prime')" data-lang-key="prime">プライムレシーバー</button>
+                <button id="calibrateButton" class="on" onclick="toggleExclusiveBonus('calibrate')" data-lang-key="calibrate">キャリブレートレシーバー</button>
+                <button id="acceralateButton" class="on" onclick="toggleBonus('acceralate')" data-lang-key="acceralate">アクセラレートノズル</button>
               </span>
               <span id="railRifleMods" style="display: none;">
-                <button id="autoPistonButton" class="on weaponMod" onclick="toggleBonus('autoPiston')" data-lang-key="autoPiston">オートピストン</button>
-                <button id="primeRailButton" class="off weaponMod" onclick="toggleExclusiveBonus('primeRail')" data-lang-key="primeRail">プライムレシーバー</button>
+                <button id="autoPistonButton" class="on" onclick="toggleBonus('autoPiston')" data-lang-key="autoPiston">オートピストン</button>
+                <button id="primeRailButton" class="off" onclick="toggleExclusiveBonus('primeRail')" data-lang-key="primeRail">プライムレシーバー</button>
               </span>
             </td>
           </tr>
-          <tr><th data-lang-key="legendary1">★1伝説効果</th><td><button id="bloodiedButton" class="on" onclick="toggleExclusiveBonus('bloodied')" data-lang-key="bloodied">血濡れ</button><button id="antiArmorButton" class="off" onclick="toggleExclusiveBonus('antiArmor')" data-lang-key="antiArmor">対アーマー</button><button id="excusionerButton" class="off" onclick="toggleExclusiveBonus('excusioner')" data-lang-key="excusioner">処刑人</button><button id="quadButton" class="off legendary" onclick="toggleExclusiveBonus('quad')" data-lang-key="quad">クアッド</button></td></tr>
-          <tr><th data-lang-key="legendary2">★2伝説効果</th><td><button id="rapidButton" class="on" onclick="toggleExclusiveBonus('rapid')" data-lang-key="rapid">迅速</button><button id="vitalButton" class="off" onclick="toggleExclusiveBonus('vital')" data-lang-key="vital">バイタル</button></td></tr>
-          <tr>
+          <tr class="category-legendary"><th data-lang-key="legendary1">★1伝説効果</th><td><button id="bloodiedButton" class="on" onclick="toggleExclusiveBonus('bloodied')" data-lang-key="bloodied">血濡れ</button><button id="antiArmorButton" class="off" onclick="toggleExclusiveBonus('antiArmor')" data-lang-key="antiArmor">対アーマー</button><button id="excusionerButton" class="off" onclick="toggleExclusiveBonus('excusioner')" data-lang-key="excusioner">処刑人</button><button id="quadButton" class="off" onclick="toggleExclusiveBonus('quad')" data-lang-key="quad">クアッド</button></td></tr>
+          <tr class="category-legendary"><th data-lang-key="legendary2">★2伝説効果</th><td><button id="rapidButton" class="on" onclick="toggleExclusiveBonus('rapid')" data-lang-key="rapid">迅速</button><button id="vitalButton" class="off" onclick="toggleExclusiveBonus('vital')" data-lang-key="vital">バイタル</button></td></tr>
+          <tr class="category-legendary">
             <th data-lang-key="legendary3">★3伝説効果</th>
             <td>
               <button id="rangersButton" class="on" onclick="toggleBonus('rangers')">Ranger's</button>
@@ -82,11 +156,11 @@
           </tr>
           <tr><th data-lang-key="totalDamageBonus">総ダメージボーナス</th><td><input type="number" id="damageBonus" value="100" readonly> %</td></tr>
           <tr><th data-lang-key="totalCriticalBonus">総クリティカルボーナス</th><td><input type="number" id="criticalBonus" value="100" readonly> %</td></tr>
-          <tr><th data-lang-key="damagePerk">ダメージ系Perk</th><td><button id="heavyGunnerButton" class="on" onclick="toggleBonus('heavyGunner')">HeavyGunner</button><button id="betterCriticalsButton" class="on" onclick="toggleBonus('betterCriticals')">Better Criticals</button><button id="bMessButton" class="on" onclick="toggleBonus('bMess')">Bloody Mess</button><button id="nerdRageButton" class="on" onclick="toggleBonus('nerdRage')">Nerd Rage</button></td></tr>
-          <tr><th data-lang-key="armorPenPerk">アーマー貫通系Perk</th><td><button id="stabilizedButton" class="on" onclick="toggleBonus('stabilized')">Stabilized</button></td></tr>
-          <tr><th data-lang-key="otherPerk">その他Perk</th><td><button id="sinButton" class="on" onclick="toggleBonus('sin')">Strange in Numbers</button><button id="perkMultiplierButton" class="on" onclick="toggleBonus('perkMultiplier')">Taking one for the Team</button><button id="followThroughButton" class="on" onclick="toggleBonus('followThrough')">Follow Through</button></td></tr>
-          <tr><th data-lang-key="mutation">変異</th><td><button id="eagleEyesButton" class="on" onclick="toggleBonus('eagleEyes')" data-lang-key="eagleEyes">ワシの目</button><button id="adrenalRButton" class="on" onclick="toggleBonus('adrenalR')" data-lang-key="adrenalR">副腎反応</button></td></tr>
-          <tr><th data-lang-key="buff">バフ系</th><td><button id="blightSoupButton" class="on" onclick="toggleBonus('blightSoup')" data-lang-key="blightSoup">ブライトのスープ</button><button id="oDriveButton" class="on" onclick="toggleExclusiveBonus('oDrive')" data-lang-key="oDrive">オーバードライブ</button><button id="phyBuffButton" class="off" onclick="toggleExclusiveBonus('phyBuff')" data-lang-key="phyBuff">サイコバフ</button><button id="heavyGunsButton" class="on" onclick="toggleBonus('heavyGuns')" data-lang-key="heavyGuns">HeavyGuns</button><button id="teslaScience9Button" class="off" onclick="toggleBonus('teslaScience9')" data-lang-key="teslaScience9">テスラサイエンス９</button></td></tr>
+          <tr class="category-perk"><th data-lang-key="damagePerk">ダメージ系Perk</th><td><button id="heavyGunnerButton" class="on" onclick="toggleBonus('heavyGunner')">HeavyGunner</button><button id="betterCriticalsButton" class="on" onclick="toggleBonus('betterCriticals')">Better Criticals</button><button id="bMessButton" class="on" onclick="toggleBonus('bMess')">Bloody Mess</button><button id="nerdRageButton" class="on" onclick="toggleBonus('nerdRage')">Nerd Rage</button></td></tr>
+          <tr class="category-perk"><th data-lang-key="armorPenPerk">アーマー貫通系Perk</th><td><button id="stabilizedButton" class="on" onclick="toggleBonus('stabilized')">Stabilized</button></td></tr>
+          <tr class="category-perk"><th data-lang-key="otherPerk">その他Perk</th><td><button id="sinButton" class="on" onclick="toggleBonus('sin')">Strange in Numbers</button><button id="perkMultiplierButton" class="on" onclick="toggleBonus('perkMultiplier')">Taking one for the Team</button><button id="followThroughButton" class="on" onclick="toggleBonus('followThrough')">Follow Through</button></td></tr>
+          <tr class="category-mutation"><th data-lang-key="mutation">変異</th><td><button id="eagleEyesButton" class="on" onclick="toggleBonus('eagleEyes')" data-lang-key="eagleEyes">ワシの目</button><button id="adrenalRButton" class="on" onclick="toggleBonus('adrenalR')" data-lang-key="adrenalR">副腎反応</button></td></tr>
+          <tr class="category-buff"><th data-lang-key="buff">バフ系</th><td><button id="blightSoupButton" class="on" onclick="toggleBonus('blightSoup')" data-lang-key="blightSoup">ブライトのスープ</button><button id="oDriveButton" class="on" onclick="toggleExclusiveBonus('oDrive')" data-lang-key="oDrive">オーバードライブ</button><button id="phyBuffButton" class="off" onclick="toggleExclusiveBonus('phyBuff')" data-lang-key="phyBuff">サイコバフ</button><button id="heavyGunsButton" class="on" onclick="toggleBonus('heavyGuns')" data-lang-key="heavyGuns">HeavyGuns</button><button id="teslaScience9Button" class="off" onclick="toggleBonus('teslaScience9')" data-lang-key="teslaScience9">テスラサイエンス９</button></td></tr>
           <tr><th data-lang-key="firingRate">発射速度</th><td><input type="text" id="firingRate" readonly> <span data-lang-key="shotsPerSecond">発/秒</span></td></tr>
           <tr><th>DPS</th><td><input type="text" id="dps" readonly></td></tr>
           <tr><th data-lang-key="killTime">討伐時間</th><td><input type="text" id="killTime" readonly> <span data-lang-key="seconds">秒</span></td></tr>
