@@ -126,32 +126,12 @@
       height: 100%;
     }
 
-    /* ボタングループのラッパー */
-    .button-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      justify-content: flex-start;
-      margin: 5px 0;
-    }
-
-    /* 数値表示セクション */
-    .damage-display {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      align-items: center;
-    }
-
-    .damage-display span {
-      margin: 0 5px;
-    }
-
     /* PC向けスタイル */
     @media (min-width: 1024px) {
       .container {
         max-width: 1200px;
         margin: 0 auto;
+        padding: 20px;
       }
 
       button {
@@ -173,8 +153,11 @@
 
       #graph-container {
         position: relative;
-        height: 400px;
+        height: 500px;
         margin-top: 20px;
+        box-shadow: none;
+        padding: 0;
+        background-color: white;
       }
 
       #scrollable-content {
