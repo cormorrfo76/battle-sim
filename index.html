@@ -700,13 +700,10 @@
       const enemyType = state.ultraciteTerrorActive ? "ultraciteTerror" : "en06";
       const bodyPart = state.eyeActive ? "eye" : state.headActive ? "head" : "body";
       const weapon = state.gatPlasmaActive ? "gatPlasma" : "railRifle";
-      
       let magazineSize = weaponData[weapon].defaultMagazineSize;
-      
       if (state.quadActive) {
         magazineSize *= 4;
       }
-
       const inputs = {
         weaponBaseDamagePhysical: weaponData[weapon].damages.physical,
         weaponBaseDamageEnergy: weaponData[weapon].damages.energy,
@@ -714,14 +711,12 @@
         enemyDamageResistancePhysical: resistances[enemyType].physical,
         enemyDamageResistanceEnergy: resistances[enemyType].energy
       };
-
       const multipliers = {
         pinPointersMultiplier: state.pinPointersActive ? 1.5 : 1,
         armorPenPerk: state.stabilizedActive ? 0.45 : 0,
         armorPenWeapon: state.stingingCoreActive ? 0.20 : 0,
         armorPenAntiArmor: state.antiArmorActive ? 0.50 : 0
       };
-
       let damageBonus = BASE_DAMAGE_BONUS +
         (state.bMessActive ? 0.15 : 0) + (state.primeActive ? 0.20 : 0) +
         (state.adrenalRActive ? (state.sinActive ? 0.625 : 0.50) : 0) +
@@ -735,17 +730,14 @@
         (state.eagleEyesActive ? (state.sinActive ? 0.625 : 0.50) : 0) +
         (state.betterCriticalsActive ? 1.00 : 0) +
         (state.vitalActive ? 0.50 : 0);
-
       document.getElementById("damageBonus").value = Math.round(damageBonus * 100);
       document.getElementById("criticalBonus").value = Math.round(criticalBonus * 100);
-
       const gameDisplayDamage = {
         physical: inputs.weaponBaseDamagePhysical * damageBonus,
         energy: inputs.weaponBaseDamageEnergy * damageBonus
       };
       document.getElementById("gameDisplayDamagePhysical").value = Math.round(gameDisplayDamage.physical);
       document.getElementById("gameDisplayDamageEnergy").value = Math.round(gameDisplayDamage.energy);
-
       const damageOnPaper = {
         physical: inputs.weaponBaseDamagePhysical * damageBonus * inputs.bodyPartMultiplier * multipliers.pinPointersMultiplier,
         energy: inputs.weaponBaseDamageEnergy * damageBonus * inputs.bodyPartMultiplier * multipliers.pinPointersMultiplier
@@ -762,10 +754,8 @@
         physical: damageOnPaper.physical * resistanceCoeff.physical,
         energy: damageOnPaper.energy * resistanceCoeff.energy
       };
-
       document.getElementById("enemyDamageResistancePhysicalAfterArmorPen").value = Math.round(resistanceAfterArmor.physical);
       document.getElementById("enemyDamageResistanceEnergyAfterArmorPen").value = Math.round(resistanceAfterArmor.energy);
-
       const criticalDamageAdd = {
         physical: inputs.weaponBaseDamagePhysical * criticalBonus * inputs.bodyPartMultiplier,
         energy: inputs.weaponBaseDamageEnergy * criticalBonus * inputs.bodyPartMultiplier
@@ -780,12 +770,10 @@
       document.getElementById("criticalDamageAddEnergy").value = Math.round(criticalDamageAdd.energy);
       document.getElementById("criticalDamagePaperPhysical").value = Math.round(criticalDamagePaper.physical);
       document.getElementById("criticalDamagePaperEnergy").value = Math.round(criticalDamagePaper.energy);
-
       const finalCriticalDamage = {
         physical: resistanceAfterArmor.physical !== 0 ? criticalDamagePaper.physical * Math.min(Math.pow((criticalDamagePaper.physical * 0.15 / resistanceAfterArmor.physical), 0.365), 0.99) : 0,
         energy: resistanceAfterArmor.energy !== 0 ? criticalDamagePaper.energy * Math.min(Math.pow((criticalDamagePaper.energy * 0.15 / resistanceAfterArmor.energy), 0.365), 0.99) : 0
       };
-
       const totals = {
         finalDamage: finalDamage.physical + finalDamage.energy,
         finalCriticalDamage: finalCriticalDamage.physical + finalCriticalDamage.energy
@@ -796,70 +784,57 @@
       document.getElementById("finalCriticalDamagePhysical").value = Math.round(finalCriticalDamage.physical);
       document.getElementById("finalCriticalDamageEnergy").value = Math.round(finalCriticalDamage.energy);
       document.getElementById("finalCriticalDamageTotal").value = Math.round(totals.finalCriticalDamage);
-
       let firingRate = weapon === "gatPlasma" ? 91 * (1 + 0.25 * (state.acceralateActive ? 1 : 0) + 0.25 * (state.rapidActive ? 1 : 0)) : 20;
       const firingRatePerSecond = firingRate / 10;
       document.getElementById("firingRate").value = firingRatePerSecond.toFixed(1);
-
       const averageDamage = (totals.finalDamage + totals.finalCriticalDamage) / 2;
       const dps = averageDamage * firingRatePerSecond;
       document.getElementById("dps").value = Math.round(dps);
-
       let reloadSpeedMultiplier = state.reloadSpeedActive ? 1.5 : 1;
       if (weapon === "gatPlasma" && state.swiftCoreActive) reloadSpeedMultiplier *= 1.5;
       const reloadTime = weaponData[weapon].baseReloadTime / reloadSpeedMultiplier;
-
       const ftMultiplier = 1.4;
       const toftMultiplier = 1.4;
       const lowHealthMultiplier = 1.5;
-
       const ftDamagePhysical = damageOnPaper.physical * ftMultiplier;
       const ftDamageEnergy = damageOnPaper.energy * ftMultiplier;
       const ftResistanceCoeffPhysical = Math.min(Math.pow((ftDamagePhysical * 0.15 / resistanceAfterArmor.physical), 0.365), 0.99);
       const ftResistanceCoeffEnergy = Math.min(Math.pow((ftDamageEnergy * 0.15 * 1.4 / resistanceAfterArmor.energy), 0.365 * 1.5), 0.99);
       const ftDamage = Math.round(ftDamagePhysical * ftResistanceCoeffPhysical + ftDamageEnergy * ftResistanceCoeffEnergy);
-
       const ftCriticalDamagePhysical = (damageOnPaper.physical + criticalDamageAdd.physical) * ftMultiplier;
       const ftCriticalDamageEnergy = (damageOnPaper.energy + criticalDamageAdd.energy) * ftMultiplier;
       const ftCriticalResistanceCoeffPhysical = Math.min(Math.pow((ftCriticalDamagePhysical * 0.15 / resistanceAfterArmor.physical), 0.365), 0.99);
       const ftCriticalResistanceCoeffEnergy = Math.min(Math.pow((ftCriticalDamageEnergy * 0.15 * 1.4 / resistanceAfterArmor.energy), 0.365 * 1.5), 0.99);
       const ftCriticalDamage = Math.round(ftCriticalDamagePhysical * ftCriticalResistanceCoeffPhysical + ftCriticalDamageEnergy * ftCriticalResistanceCoeffEnergy);
-
       const toftDamagePhysical = damageOnPaper.physical * toftMultiplier;
       const toftDamageEnergy = damageOnPaper.energy * toftMultiplier;
       const toftResistanceCoeffPhysical = Math.min(Math.pow((toftDamagePhysical * 0.15 / resistanceAfterArmor.physical), 0.365), 0.99);
       const toftResistanceCoeffEnergy = Math.min(Math.pow((toftDamageEnergy * 0.15 / resistanceAfterArmor.energy), 0.365), 0.99);
       const toftDamage = Math.round(toftDamagePhysical * toftResistanceCoeffPhysical + toftDamageEnergy * toftResistanceCoeffEnergy);
-
       const toftCriticalDamagePhysical = (damageOnPaper.physical + criticalDamageAdd.physical) * toftMultiplier;
       const toftCriticalDamageEnergy = (damageOnPaper.energy + criticalDamageAdd.energy) * toftMultiplier;
       const toftCriticalResistanceCoeffPhysical = Math.min(Math.pow((toftCriticalDamagePhysical * 0.15 / resistanceAfterArmor.physical), 0.365), 0.99);
       const toftCriticalResistanceCoeffEnergy = Math.min(Math.pow((toftCriticalDamageEnergy * 0.15 / resistanceAfterArmor.energy), 0.365), 0.99);
       const toftCriticalDamage = Math.round(toftCriticalDamagePhysical * toftCriticalResistanceCoeffPhysical + toftCriticalDamageEnergy * toftCriticalResistanceCoeffEnergy);
-
       const killTime = parseFloat(document.getElementById("killTime").value || 0);
       const lowHealthBaseMultiplier = (state.perkMultiplierActive && killTime >= 25) ? toftMultiplier : 1;
       const combinedMultiplier = lowHealthBaseMultiplier * lowHealthMultiplier;
-
       const lowHealthDamagePhysical = damageOnPaper.physical * combinedMultiplier;
       const lowHealthDamageEnergy = damageOnPaper.energy * combinedMultiplier;
       const lowHealthResistanceCoeffPhysical = Math.min(Math.pow((lowHealthDamagePhysical * 0.15 / resistanceAfterArmor.physical), 0.365), 0.99);
       const lowHealthResistanceCoeffEnergy = Math.min(Math.pow((lowHealthDamageEnergy * 0.15 / resistanceAfterArmor.energy), 0.365), 0.99);
       const lowHealthDamage = Math.round(lowHealthDamagePhysical * lowHealthResistanceCoeffPhysical + lowHealthDamageEnergy * lowHealthResistanceCoeffEnergy);
-
       const lowHealthCriticalDamagePhysical = (damageOnPaper.physical + criticalDamageAdd.physical) * combinedMultiplier;
       const lowHealthCriticalDamageEnergy = (damageOnPaper.energy + criticalDamageAdd.energy) * combinedMultiplier;
       const lowHealthCriticalResistanceCoeffPhysical = Math.min(Math.pow((lowHealthCriticalDamagePhysical * 0.15 / resistanceAfterArmor.physical), 0.365), 0.99);
       const lowHealthCriticalResistanceCoeffEnergy = Math.min(Math.pow((lowHealthCriticalDamageEnergy * 0.15 / resistanceAfterArmor.energy), 0.365), 0.99);
       const lowHealthCriticalDamage = Math.round(lowHealthCriticalDamagePhysical * lowHealthCriticalResistanceCoeffPhysical + lowHealthCriticalDamageEnergy * lowHealthCriticalResistanceCoeffEnergy);
-
       document.getElementById("ftDamage").value = ftDamage;
       document.getElementById("ftCriticalDamage").value = ftCriticalDamage;
       document.getElementById("toftDamage").value = toftDamage;
       document.getElementById("toftCriticalDamage").value = toftCriticalDamage;
       document.getElementById("lowHealthDamage").value = lowHealthDamage;
       document.getElementById("lowHealthCriticalDamage").value = lowHealthCriticalDamage;
-
       plotCumulativeDamage(damageOnPaper, criticalDamageAdd, resistanceAfterArmor, firingRatePerSecond, magazineSize, reloadTime);
     }
 
@@ -879,7 +854,6 @@
       let excusionerTime = null;
       let bodyPartTime = null;
       let killTime = null;
-
       while (time <= maxTime && health > 0) {
         if (shotsFired >= magazineSize) {
           time += reloadTime;
@@ -888,13 +862,11 @@
           dataPoints.push(Math.min(cumulativeDamage, bossMaxHealth));
           continue;
         }
-
         let multiplier = 1;
         if (state.followThroughActive && time <= 10) multiplier *= 1.4;
         if (state.perkMultiplierActive && time >= 25) multiplier *= 1.4;
         if (state.excusionerActive && health <= excusionerThreshold) multiplier *= 1.5;
         if (health <= bodyPartThreshold) multiplier *= 1.5;
-
         let damagePhysical, damageEnergy;
         if (isCritical) {
           damagePhysical = (damageOnPaper.physical + criticalDamageAdd.physical) * multiplier;
@@ -903,36 +875,28 @@
           damagePhysical = damageOnPaper.physical * multiplier;
           damageEnergy = damageOnPaper.energy * multiplier;
         }
-
         const resistanceCoeffPhysical = Math.min(Math.pow((damagePhysical * 0.15 / resistanceAfterArmor.physical), 0.365), 0.99);
         const resistanceCoeffEnergy = Math.min(Math.pow((damageEnergy * (state.followThroughActive && time <= 10 ? 0.15 * 1.4 : 0.15) / resistanceAfterArmor.energy), (state.followThroughActive && time <= 10 ? 0.365 * 1.5 : 0.365)), 0.99);
-
         const actualDamagePhysical = damagePhysical * resistanceCoeffPhysical;
         const actualDamageEnergy = damageEnergy * resistanceCoeffEnergy;
         const totalActualDamage = actualDamagePhysical + actualDamageEnergy;
-
         cumulativeDamage += totalActualDamage;
         health -= totalActualDamage;
         shotsFired++;
-
         if (health <= excusionerThreshold && !excusionerTime) excusionerTime = time.toFixed(1);
         if (health <= bodyPartThreshold && !bodyPartTime) bodyPartTime = time.toFixed(1);
         if (health <= 0 && !killTime) killTime = time.toFixed(1);
-
         times.push(time.toFixed(1));
         dataPoints.push(Math.min(cumulativeDamage, bossMaxHealth));
         time += interval;
         isCritical = !isCritical;
       }
-
       if (time < maxTime) {
         times.push(maxTime.toFixed(1));
         dataPoints.push(Math.min(cumulativeDamage, bossMaxHealth));
       }
       if (!killTime) killTime = time.toFixed(1);
-
       document.getElementById("killTime").value = killTime;
-
       const annotations = [];
       let yOffset = 0;
       if (state.perkMultiplierActive && parseFloat(killTime) > 25) {
@@ -947,7 +911,6 @@
       if (parseFloat(killTime) <= 60) {
         annotations.push({ type: 'line', mode: 'vertical', scaleID: 'x', value: killTime, borderColor: 'black', borderWidth: 1, label: { content: `討伐 (${killTime}秒)`, enabled: true, position: 'top', yAdjust: yOffset += 25, font: { size: 16 } } });
       }
-
       const ctx = document.getElementById("damageGraph").getContext("2d");
       if (chart) chart.destroy();
       chart = new Chart(ctx, {
@@ -965,26 +928,26 @@
         options: {
           animation: { duration: 0 },
           scales: {
-            x: { 
-              type: 'linear', 
-              min: 0, 
-              max: 60, 
-              title: { 
-                display: true, 
-                text: langData[currentLang].graphTime, 
-                font: { size: 16 } 
-              }, 
-              ticks: { stepSize: 10, font: { size: 14 } } 
+            x: {
+              type: 'linear',
+              min: 0,
+              max: 60,
+              title: {
+                display: true,
+                text: langData[currentLang].graphTime,
+                font: { size: 16 }
+              },
+              ticks: { stepSize: 10, font: { size: 14 } }
             },
-            y: { 
-              title: { 
-                display: true, 
-                text: langData[currentLang].graphCumulativeDamage, 
-                font: { size: 16 } 
-              }, 
-              max: bossMaxHealth, 
-              beginAtZero: true, 
-              ticks: { font: { size: 14 } } 
+            y: {
+              title: {
+                display: true,
+                text: langData[currentLang].graphCumulativeDamage,
+                font: { size: 16 }
+              },
+              max: bossMaxHealth,
+              beginAtZero: true,
+              ticks: { font: { size: 14 } }
             }
           },
           plugins: {
@@ -1019,7 +982,6 @@
           button.addEventListener('touchstart', function() {
             this.classList.add('touch');
           }, false);
-          
           button.addEventListener('touchend', function() {
             this.classList.remove('touch');
           }, false);
