@@ -1,0 +1,648 @@
+<style>
+html, body {
+    max-height: 95%;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  border: 1px solid black;
+  padding: 8px;
+  text-align: left;
+}
+th {
+  background-color: #f2f2f2;
+}
+
+input[type="number"]:not([readonly]),
+select:not([readonly]),
+input[type="checkbox"]:not([readonly]) {
+  background-color: #ffffcc; /* 入力フィールドのみハイライト */
+}
+input[type="number"] {
+  width: 60px; /* 数字入力欄の横幅を調整 */
+}
+
+input[type="text"] {
+  width: 60px; /* 計算結果入力欄の横幅を調整 */
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100px;
+  background: transparent;
+}
+
+button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.05s ease;
+  font-size: 1em;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  min-width: 80px;
+}
+
+button.on {
+  background-color: #008000;
+  color: white;
+}
+
+button.off {
+  background-color: #DDDDDD;
+  color: white;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+/* スライダー修正 */
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  background: linear-gradient(to right, #008000 0%, #008000 var(--value), #ddd var(--value), #ddd 100%);
+  border-radius: 4px;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  background: #008000;
+  border-radius: 50%;
+  margin-top: -4px;
+}
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  background: #ddd;
+  border-radius: 4px;
+}
+input[type="range"]::-moz-range-progress {
+  height: 8px;
+  background: #008000;
+  border-radius: 4px;
+}
+input[type="range"]::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  background: #008000;
+  border: none;
+  border-radius: 50%;
+}
+input[type="range"]::-ms-track {
+  height: 8px;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type="range"]::-ms-fill-lower {
+  background: #008000;
+  border-radius: 4px;
+}
+input[type="range"]::-ms-fill-upper {
+  background: #ddd;
+  border-radius: 4px;
+}
+input[type="range"]::-ms-thumb {
+  height: 16px;
+  width: 16px;
+  background: #008000;
+  border-radius: 50%;
+}
+
+/* パーセント表示を3桁分のスペースに固定 */
+#otherBonusesValue, #bodyPartMultiplierValue {
+  display: inline-block;
+  width: 3em;
+  text-align: right;
+}
+
+/* スクロール可能な領域 */
+#scrollable-content {
+  max-height: 100%;
+  overflow-y: scroll;
+}
+
+/* テーブル全体 */
+#scrollable-content table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+/* ヘッダー固定用 */
+#scrollable-content thead th, #scrollable-content thead td {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f2f2f2;
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+/* 2行目を考慮した固定設定 */
+#scrollable-content thead tr:nth-child(1) th, #scrollable-content thead tr:nth-child(1) td {
+  top: 0;
+}
+#scrollable-content thead tr:nth-child(2) th, #scrollable-content thead tr:nth-child(2) td {
+  top: 42px;
+}
+
+/* 本体部分 */
+#scrollable-content tbody th, #scrollable-content tbody td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+/* 列幅を揃える */
+#scrollable-content th {
+  width: 50%;
+}
+#scrollable-content td {
+  width: 50%;
+}
+</style>
+
+<div style="height: 95vh; overflow-y: auto; position: relative;">
+<div id="scrollable-content">
+  <table>
+    <thead>
+      <tr>
+        <th>最終通常ダメ合計</th>
+        <td><input type="text" id="finalDamageTotal" readonly></td>
+      </tr>
+      <tr>
+        <th>最終クリダメ(合計)</th>
+        <td><input type="text" id="finalCriticalDamageTotal" readonly></td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>プリセット</th>
+        <td>
+          <select id="presetSelect" onchange="applyPreset()">
+            <option value="default">デフォルト</option>
+            <option value="preset1">プリセット1</option>
+            <option value="preset2">プリセット2</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <th>敵耐性</th>
+        <td><input type="number" id="enemyDamageResistancePhysical" value="183" onchange="calculateDamage()">/<input type="number" id="enemyDamageResistanceEnergy" value="213" onchange="calculateDamage()"></td>
+      </tr>
+      <tr>
+        <th>部位ダメボ</th>
+        <td><input type="range" id="bodyPartMultiplier" min="0" max="300" step="50" value="300" onchange="calculateDamage()"> <span id="bodyPartMultiplierValue">300%</span></td>
+      </tr>
+      <tr>
+        <th>武器基礎</th>
+        <td><input type="number" id="weaponBaseDamagePhysical" value="35" onchange="calculateDamage()">/<input type="number" id="weaponBaseDamageEnergy" value="35" onchange="calculateDamage()"></td>
+      </tr>
+      <tr>
+        <th>アーマーPerk</th>
+        <td><button id="stabilizedButton" class="on" onclick="toggleBonus('stabilized')">Stabilized</button></td>
+      </tr>
+      <tr>
+        <th>武器アーマー</th>
+        <td><button id="stingingCoreButton" class="on" onclick="toggleBonus('stingingCore')">StingingCore</button></td>
+      </tr>
+      <tr>
+        <th>Prime</th>
+        <td>
+          <button id="primeButton" class="off" onclick="toggleExclusiveBonus('prime')">Prime</button>
+          <button id="calibrateButton" class="on" onclick="toggleExclusiveBonus('calibrate')">Calibrate</button>
+        </td>
+      </tr>
+      <tr>
+        <th>Pin-Pointer's</th>
+        <td><button id="pinPointersButton" class="on" onclick="toggleBonus('pinPointers')">Pin-Pointer's</button></td>
+      </tr>
+      <tr>
+        <th>ダメボ</th>
+        <td><input type="number" id="damageBonus" value="100" readonly> %</td>
+      </tr>
+      <tr>
+        <th>クリダメボ</th>
+        <td><input type="number" id="criticalBonus" value="100" readonly> %</td>
+      </tr>
+      <tr>
+        <th>Other Bonuses</th>
+        <td><input type="range" id="otherBonuses" min="0" max="200" step="10" value="60" onchange="calculateDamage()"> <span id="otherBonusesValue">60%</span></td>
+      </tr>
+      <tr>
+        <th>B.Mess</th>
+        <td><button id="bMessButton" class="on" onclick="toggleBonus('bMess')">B.Mess</button></td>
+      </tr>
+      <tr>
+        <th>AdrenalR</th>
+        <td>
+          <button id="adrenalRButton" class="on" onclick="toggleBonus('adrenalR')">AdrenalR</button>
+          <input type="checkbox" id="adrenalRSiN" checked onchange="calculateDamage()"> SiN
+        </td>
+      </tr>
+      <tr>
+        <th>Bloodied</th>
+        <td>
+          <button id="bloodiedButton" class="on" onclick="toggleExclusiveBonus('bloodied')">Bloodied</button>
+          <button id="antiArmorButton" class="off" onclick="toggleExclusiveBonus('antiArmor')">Anti-Armor</button>
+          <button id="excusionerButton" class="off" onclick="toggleExclusiveBonus('excusioner')">Excusioner</button>
+        </td>
+      </tr>
+      <tr>
+        <th>BlightSoup</th>
+        <td>
+          <button id="blightSoupButton" class="on" onclick="toggleBonus('blightSoup')">BlightSoup</button>
+          <input type="checkbox" id="blightSoupSiN" checked onchange="calculateDamage()"> SiN
+        </td>
+      </tr>
+      <tr>
+        <th>O.Drive</th>
+        <td>
+          <button id="oDriveButton" class="on" onclick="toggleExclusiveBonus('oDrive')">O.Drive</button>
+          <button id="phyBuffButton" class="off" onclick="toggleExclusiveBonus('phyBuff')">PhyBuff</button>
+        </td>
+      </tr>
+      <tr>
+        <th>HeavyGuns</th>
+        <td><button id="heavyGunsButton" class="off" onclick="toggleBonus('heavyGuns')">HeavyGuns</button></td>
+      </tr>
+      <tr>
+        <th>TeslaScience9</th>
+        <td><button id="teslaScience9Button" class="off" onclick="toggleBonus('teslaScience9')">TeslaScience9</button></td>
+      </tr>
+      <tr>
+        <th>TOFT</th>
+        <td>
+          <button id="perkMultiplierButton" class="off" onclick="toggleExclusiveBonus('perkMultiplier')">TOFT</button>
+          <button id="followThroughButton" class="on" onclick="toggleExclusiveBonus('followThrough')">F.Through</button>
+        </td>
+      </tr>
+      <tr>
+        <th>ゲーム内表記ダメ</th>
+        <td><input type="text" id="gameDisplayDamagePhysical" readonly>/<input type="text" id="gameDisplayDamageEnergy" readonly></td>
+      </tr>
+      <tr>
+        <th>紙ダメ</th>
+        <td><input type="text" id="damageOnPaperPhysical" readonly>/<input type="text" id="damageOnPaperEnergy" readonly></td>
+      </tr>
+      <tr>
+        <th>アーマー後耐性</th>
+        <td>
+          <input type="text" id="enemyDamageResistancePhysicalAfterArmorPen" readonly>/<input type="text" id="enemyDamageResistanceEnergyAfterArmorPen" readonly>
+        </td>
+      </tr>
+      <tr>
+        <th>最終通常ダメ(耐性別)</th>
+        <td><input type="text" id="finalDamagePhysical" readonly>/<input type="text" id="finalDamageEnergy" readonly></td>
+      </tr>
+      <tr>
+        <th>クリダメ加算</th>
+        <td><input type="text" id="criticalDamageAddPhysical" readonly>/<input type="text" id="criticalDamageAddEnergy" readonly></td>
+      </tr>
+      <tr>
+        <th>紙クリダメ</th>
+        <td><input type="text" id="criticalDamagePaperPhysical" readonly>/<input type="text" id="criticalDamagePaperEnergy" readonly></td>
+      </tr>
+      <tr>
+        <th>最終クリダメ(耐性別)</th>
+        <td><input type="text" id="finalCriticalDamagePhysical" readonly>/<input type="text" id="finalCriticalDamageEnergy" readonly></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</div>
+<script>
+const BASE_DAMAGE_BONUS = 1;
+let bMessActive = true;
+let primeActive = false;
+let calibrateActive = true;
+let adrenalRActive = true;
+let adrenalRSiNActive = true;
+let bloodiedActive = true;
+let antiArmorActive = false;
+let excusionerActive = false;
+let blightSoupActive = true;
+let blightSoupSiNActive = true;
+let heavyGunsActive = false;
+let teslaScience9Active = false;
+let oDriveActive = true;
+let phyBuffActive = false;
+let perkMultiplierActive = false;
+let followThroughActive = true;
+let stabilizedActive = true;
+let stingingCoreActive = true;
+let pinPointersActive = true;
+
+function applyPreset() {
+  const preset = document.getElementById("presetSelect").value;
+  const weaponBaseDamagePhysical = 35;
+  const weaponBaseDamageEnergy = 35;
+  const bodyPartMultiplier = 300;
+
+  switch (preset) {
+    case "preset1": // 全部解除
+      bMessActive = false;
+      primeActive = false;
+      calibrateActive = false;
+      adrenalRActive = false;
+      adrenalRSiNActive = false;
+      bloodiedActive = false;
+      antiArmorActive = false;
+      excusionerActive = false;
+      blightSoupActive = false;
+      blightSoupSiNActive = false;
+      heavyGunsActive = false;
+      teslaScience9Active = false;
+      oDriveActive = false;
+      phyBuffActive = false;
+      perkMultiplierActive = false;
+      followThroughActive = false;
+      stabilizedActive = false;
+      stingingCoreActive = false;
+      pinPointersActive = false;
+      break;
+    case "preset2": // 全部選択
+      bMessActive = true;
+      primeActive = true;
+      calibrateActive = false;
+      adrenalRActive = true;
+      adrenalRSiNActive = true;
+      bloodiedActive = false;
+      antiArmorActive = true;
+      excusionerActive = false;
+      blightSoupActive = true;
+      blightSoupSiNActive = true;
+      heavyGunsActive = true;
+      teslaScience9Active = true;
+      oDriveActive = false;
+      phyBuffActive = true;
+      perkMultiplierActive = true;
+      followThroughActive = false;
+      stabilizedActive = true;
+      stingingCoreActive = true;
+      pinPointersActive = true;
+      break;
+    default: // デフォルト
+      bMessActive = true;
+      primeActive = false;
+      calibrateActive = true;
+      adrenalRActive = true;
+      adrenalRSiNActive = true;
+      bloodiedActive = true;
+      antiArmorActive = false;
+      excusionerActive = false;
+      blightSoupActive = true;
+      blightSoupSiNActive = true;
+      heavyGunsActive = false;
+      teslaScience9Active = false;
+      oDriveActive = true;
+      phyBuffActive = false;
+      perkMultiplierActive = false;
+      followThroughActive = true;
+      stabilizedActive = true;
+      stingingCoreActive = true;
+      pinPointersActive = true;
+  }
+
+  document.getElementById("weaponBaseDamagePhysical").value = weaponBaseDamagePhysical;
+  document.getElementById("weaponBaseDamageEnergy").value = weaponBaseDamageEnergy;
+  document.getElementById("bodyPartMultiplier").value = bodyPartMultiplier;
+  document.getElementById("bodyPartMultiplierValue").textContent = bodyPartMultiplier + "%";
+  document.getElementById("bodyPartMultiplier").style.setProperty('--value', (bodyPartMultiplier / 3) + '%');
+  updateButtonClass("bMessButton", bMessActive);
+  updateButtonClass("primeButton", primeActive);
+  updateButtonClass("calibrateButton", calibrateActive);
+  updateButtonClass("adrenalRButton", adrenalRActive);
+  document.getElementById("adrenalRSiN").checked = adrenalRSiNActive;
+  updateButtonClass("bloodiedButton", bloodiedActive);
+  updateButtonClass("antiArmorButton", antiArmorActive);
+  updateButtonClass("excusionerButton", excusionerActive);
+  updateButtonClass("blightSoupButton", blightSoupActive);
+  document.getElementById("blightSoupSiN").checked = blightSoupSiNActive;
+  updateButtonClass("heavyGunsButton", heavyGunsActive);
+  updateButtonClass("teslaScience9Button", teslaScience9Active);
+  updateButtonClass("oDriveButton", oDriveActive);
+  updateButtonClass("phyBuffButton", phyBuffActive);
+  updateButtonClass("perkMultiplierButton", perkMultiplierActive);
+  updateButtonClass("followThroughButton", followThroughActive);
+  updateButtonClass("stabilizedButton", stabilizedActive);
+  updateButtonClass("stingingCoreButton", stingingCoreActive);
+  updateButtonClass("pinPointersButton", pinPointersActive);
+  calculateDamage();
+}
+
+function toggleBonus(bonus) {
+  switch (bonus) {
+    case "bMess": bMessActive = !bMessActive; updateButtonClass("bMessButton", bMessActive); break;
+    case "adrenalR": adrenalRActive = !adrenalRActive; updateButtonClass("adrenalRButton", adrenalRActive); break;
+    case "blightSoup": blightSoupActive = !blightSoupActive; updateButtonClass("blightSoupButton", blightSoupActive); break;
+    case "heavyGuns": heavyGunsActive = !heavyGunsActive; updateButtonClass("heavyGunsButton", heavyGunsActive); break;
+    case "teslaScience9": teslaScience9Active = !teslaScience9Active; updateButtonClass("teslaScience9Button", teslaScience9Active); break;
+    case "stabilized": stabilizedActive = !stabilizedActive; updateButtonClass("stabilizedButton", stabilizedActive); break;
+    case "stingingCore": stingingCoreActive = !stingingCoreActive; updateButtonClass("stingingCoreButton", stingingCoreActive); break;
+    case "pinPointers": pinPointersActive = !pinPointersActive; updateButtonClass("pinPointersButton", pinPointersActive); break;
+  }
+  calculateDamage();
+}
+
+function toggleExclusiveBonus(bonus) {
+  if (bonus === "perkMultiplier") {
+    perkMultiplierActive = !perkMultiplierActive ? true : false;
+    followThroughActive = false;
+    updateButtonClass("perkMultiplierButton", perkMultiplierActive);
+    updateButtonClass("followThroughButton", followThroughActive);
+  } else if (bonus === "followThrough") {
+    followThroughActive = !followThroughActive ? true : false;
+    perkMultiplierActive = false;
+    updateButtonClass("perkMultiplierButton", perkMultiplierActive);
+    updateButtonClass("followThroughButton", followThroughActive);
+  } else if (bonus === "prime") {
+    primeActive = !primeActive ? true : false;
+    calibrateActive = false;
+    updateButtonClass("primeButton", primeActive);
+    updateButtonClass("calibrateButton", calibrateActive);
+  } else if (bonus === "calibrate") {
+    calibrateActive = !calibrateActive ? true : false;
+    primeActive = false;
+    updateButtonClass("primeButton", primeActive);
+    updateButtonClass("calibrateButton", calibrateActive);
+  } else if (bonus === "oDrive") {
+    oDriveActive = !oDriveActive ? true : false;
+    phyBuffActive = false;
+    updateButtonClass("oDriveButton", oDriveActive);
+    updateButtonClass("phyBuffButton", phyBuffActive);
+  } else if (bonus === "phyBuff") {
+    phyBuffActive = !phyBuffActive ? true : false;
+    oDriveActive = false;
+    updateButtonClass("oDriveButton", oDriveActive);
+    updateButtonClass("phyBuffButton", phyBuffActive);
+  } else if (bonus === "bloodied") {
+    bloodiedActive = !bloodiedActive ? true : false;
+    antiArmorActive = false;
+    excusionerActive = false;
+    updateButtonClass("bloodiedButton", bloodiedActive);
+    updateButtonClass("antiArmorButton", antiArmorActive);
+    updateButtonClass("excusionerButton", excusionerActive);
+  } else if (bonus === "antiArmor") {
+    antiArmorActive = !antiArmorActive ? true : false;
+    bloodiedActive = false;
+    excusionerActive = false;
+    updateButtonClass("bloodiedButton", bloodiedActive);
+    updateButtonClass("antiArmorButton", antiArmorActive);
+    updateButtonClass("excusionerButton", excusionerActive);
+  } else if (bonus === "excusioner") {
+    excusionerActive = !excusionerActive ? true : false;
+    bloodiedActive = false;
+    antiArmorActive = false;
+    updateButtonClass("bloodiedButton", bloodiedActive);
+    updateButtonClass("antiArmorButton", antiArmorActive);
+    updateButtonClass("excusionerButton", excusionerActive);
+  }
+  calculateDamage();
+}
+
+function updateButtonClass(buttonId, isActive) {
+  const button = document.getElementById(buttonId);
+  if (isActive) {
+    button.classList.remove("off");
+    button.classList.add("on");
+  } else {
+    button.classList.remove("on");
+    button.classList.add("off");
+  }
+}
+
+document.getElementById("otherBonuses").addEventListener("input", function() {
+  document.getElementById("otherBonusesValue").textContent = this.value + "%";
+  this.style.setProperty('--value', this.value / 2 + '%'); // 200%スケール対応
+});
+document.getElementById("bodyPartMultiplier").addEventListener("input", function() {
+  document.getElementById("bodyPartMultiplierValue").textContent = this.value + "%";
+  this.style.setProperty('--value', (this.value / 3) + '%');
+});
+
+function calculateDamage() {
+  const weaponBaseDamagePhysical = parseFloat(document.getElementById("weaponBaseDamagePhysical").value);
+  const weaponBaseDamageEnergy = parseFloat(document.getElementById("weaponBaseDamageEnergy").value);
+  const bodyPartMultiplier = parseFloat(document.getElementById("bodyPartMultiplier").value) / 100;
+  const perkMultiplier = (perkMultiplierActive || followThroughActive) ? 1.4 : 1;
+  const pinPointersMultiplier = pinPointersActive ? 1.5 : 1;
+  const enemyDamageResistancePhysical = parseFloat(document.getElementById("enemyDamageResistancePhysical").value);
+  const enemyDamageResistanceEnergy = parseFloat(document.getElementById("enemyDamageResistanceEnergy").value);
+  const armorPenPerk = stabilizedActive ? 0.45 : 0;
+  const armorPenWeapon = stingingCoreActive ? 0.20 : 0;
+  const armorPenAntiArmor = antiArmorActive ? 0.50 : 0;
+  const excusionerMultiplier = excusionerActive ? 1.5 : 1;
+  const otherBonuses = parseFloat(document.getElementById("otherBonuses").value) / 100;
+  adrenalRSiNActive = document.getElementById("adrenalRSiN").checked;
+  blightSoupSiNActive = document.getElementById("blightSoupSiN").checked;
+
+  let damageBonus = BASE_DAMAGE_BONUS;
+  let criticalBonus = 1;
+  damageBonus += otherBonuses;
+  if (bMessActive) damageBonus += 0.15;
+  if (primeActive) damageBonus += 0.20;
+  if (calibrateActive) criticalBonus += 1.00;
+  if (adrenalRActive) damageBonus += adrenalRSiNActive ? 0.625 : 0.50;
+  if (bloodiedActive) damageBonus += 0.95;
+  if (blightSoupActive) criticalBonus += blightSoupSiNActive ? 1.25 : 1.00;
+  if (heavyGunsActive) damageBonus += 0.20;
+  if (teslaScience9Active) criticalBonus += 1.00;
+  if (oDriveActive) { damageBonus += 0.15; criticalBonus += 0.30; }
+  if (phyBuffActive) damageBonus += 0.25;
+
+  document.getElementById("damageBonus").value = (damageBonus * 100).toFixed(0);
+  document.getElementById("criticalBonus").value = (criticalBonus * 100).toFixed(0);
+
+  const gameDisplayDamagePhysical = weaponBaseDamagePhysical * damageBonus;
+  const gameDisplayDamageEnergy = weaponBaseDamageEnergy * damageBonus;
+  document.getElementById("gameDisplayDamagePhysical").value = gameDisplayDamagePhysical.toFixed(1);
+  document.getElementById("gameDisplayDamageEnergy").value = gameDisplayDamageEnergy.toFixed(1);
+
+  const damageOnPaperPhysical = weaponBaseDamagePhysical * damageBonus * bodyPartMultiplier * perkMultiplier * pinPointersMultiplier * excusionerMultiplier;
+  const enemyDamageResistancePhysicalAfterArmorPen = enemyDamageResistancePhysical * (1 - armorPenPerk) * (1 - armorPenWeapon) * (1 - armorPenAntiArmor);
+  const enemyDamageResistanceCoeffPhysical = Math.min(Math.pow(((damageOnPaperPhysical * 0.15) / enemyDamageResistancePhysicalAfterArmorPen), 0.365), 0.99);
+  const finalDamagePhysical = damageOnPaperPhysical * enemyDamageResistanceCoeffPhysical;
+
+  const damageOnPaperEnergy = weaponBaseDamageEnergy * damageBonus * bodyPartMultiplier * perkMultiplier * pinPointersMultiplier * excusionerMultiplier;
+  const enemyDamageResistanceEnergyAfterArmorPen = enemyDamageResistanceEnergy * (1 - armorPenPerk) * (1 - armorPenWeapon) * (1 - armorPenAntiArmor);
+  const followThroughCoeff_015 = followThroughActive ? 1.4 : 1;
+  const followThroughCoeff_0365 = followThroughActive ? 1.5 : 1;
+  const enemyDamageResistanceCoeffEnergy = Math.min(Math.pow(((damageOnPaperEnergy * 0.15) * followThroughCoeff_015 / enemyDamageResistanceEnergyAfterArmorPen), (0.365 * followThroughCoeff_0365)), 0.99);
+  const finalDamageEnergy = damageOnPaperEnergy * enemyDamageResistanceCoeffEnergy;
+
+  document.getElementById('enemyDamageResistancePhysicalAfterArmorPen').value = enemyDamageResistancePhysicalAfterArmorPen.toFixed(1);
+  document.getElementById('enemyDamageResistanceEnergyAfterArmorPen').value = enemyDamageResistanceEnergyAfterArmorPen.toFixed(1);
+
+  const criticalDamageAddPhysical = weaponBaseDamagePhysical * criticalBonus * bodyPartMultiplier * perkMultiplier * pinPointersMultiplier * excusionerMultiplier;
+  const criticalDamageAddEnergy = weaponBaseDamageEnergy * criticalBonus * bodyPartMultiplier * perkMultiplier * pinPointersMultiplier * excusionerMultiplier;
+  document.getElementById("criticalDamageAddPhysical").value = criticalDamageAddPhysical.toFixed(1);
+  document.getElementById("criticalDamageAddEnergy").value = criticalDamageAddEnergy.toFixed(1);
+
+  const criticalDamagePaperPhysical = damageOnPaperPhysical + criticalDamageAddPhysical;
+  const criticalDamagePaperEnergy = damageOnPaperEnergy + criticalDamageAddEnergy;
+  document.getElementById("damageOnPaperPhysical").value = damageOnPaperPhysical.toFixed(1);
+  document.getElementById("damageOnPaperEnergy").value = damageOnPaperEnergy.toFixed(1);
+  document.getElementById("criticalDamagePaperPhysical").value = criticalDamagePaperPhysical.toFixed(1);
+  document.getElementById("criticalDamagePaperEnergy").value = criticalDamagePaperEnergy.toFixed(1);
+
+  let finalCriticalDamagePhysical = 0;
+  if (enemyDamageResistancePhysicalAfterArmorPen !== 0) {
+    const enemyCriticalDamageResistanceCoeffPhysical = Math.min(Math.pow(((criticalDamagePaperPhysical * 0.15) / enemyDamageResistancePhysicalAfterArmorPen), 0.365), 0.99);
+    finalCriticalDamagePhysical = criticalDamagePaperPhysical * enemyCriticalDamageResistanceCoeffPhysical;
+  }
+
+  let finalCriticalDamageEnergy = 0;
+  if (enemyDamageResistanceEnergyAfterArmorPen !== 0) {
+    const enemyCriticalDamageResistanceCoeffEnergy = Math.min(Math.pow(((criticalDamagePaperEnergy * 0.15) * followThroughCoeff_015 / enemyDamageResistanceEnergyAfterArmorPen), (0.365 * followThroughCoeff_0365)), 0.99);
+    finalCriticalDamageEnergy = criticalDamagePaperEnergy * enemyCriticalDamageResistanceCoeffEnergy;
+  }
+
+  const finalDamageTotal = finalDamagePhysical + finalDamageEnergy;
+  const finalCriticalDamageTotal = finalCriticalDamagePhysical + finalCriticalDamageEnergy;
+  document.getElementById("finalDamagePhysical").value = finalDamagePhysical.toFixed(1);
+  document.getElementById("finalDamageEnergy").value = finalDamageEnergy.toFixed(1);
+  document.getElementById("finalDamageTotal").value = finalDamageTotal.toFixed(1);
+  document.getElementById("finalCriticalDamagePhysical").value = finalCriticalDamagePhysical.toFixed(1);
+  document.getElementById("finalCriticalDamageEnergy").value = finalCriticalDamageEnergy.toFixed(1);
+  document.getElementById("finalCriticalDamageTotal").value = finalCriticalDamageTotal.toFixed(1);
+}
+
+window.onload = function() {
+  const otherBonusesSlider = document.getElementById("otherBonuses");
+  otherBonusesSlider.style.setProperty('--value', otherBonusesSlider.value / 2 + '%');
+  document.getElementById("otherBonusesValue").textContent = otherBonusesSlider.value + "%";
+
+  const bodyPartMultiplierSlider = document.getElementById("bodyPartMultiplier");
+  bodyPartMultiplierSlider.style.setProperty('--value', (bodyPartMultiplierSlider.value / 3) + '%');
+  document.getElementById("bodyPartMultiplierValue").textContent = bodyPartMultiplierSlider.value + "%";
+
+  updateButtonClass("bMessButton", bMessActive);
+  updateButtonClass("primeButton", primeActive);
+  updateButtonClass("calibrateButton", calibrateActive);
+  updateButtonClass("adrenalRButton", adrenalRActive);
+  updateButtonClass("bloodiedButton", bloodiedActive);
+  updateButtonClass("antiArmorButton", antiArmorActive);
+  updateButtonClass("excusionerButton", excusionerActive);
+  updateButtonClass("blightSoupButton", blightSoupActive);
+  updateButtonClass("heavyGunsButton", heavyGunsActive);
+  updateButtonClass("teslaScience9Button", teslaScience9Active);
+  updateButtonClass("oDriveButton", oDriveActive);
+  updateButtonClass("phyBuffButton", phyBuffActive);
+  updateButtonClass("perkMultiplierButton", perkMultiplierActive);
+  updateButtonClass("followThroughButton", followThroughActive);
+  updateButtonClass("stabilizedButton", stabilizedActive);
+  updateButtonClass("stingingCoreButton", stingingCoreActive);
+  updateButtonClass("pinPointersButton", pinPointersActive);
+
+  calculateDamage();
+};
+</script>
