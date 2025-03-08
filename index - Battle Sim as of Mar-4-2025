@@ -1,6 +1,6 @@
 <style>
 html, body {
-    max-height: 95%;
+    max-height: 97%;
 }
 table {
   border-collapse: collapse;
@@ -30,6 +30,7 @@ input[type="text"] {
 
 input[type="range"] {
   -webkit-appearance: none;
+  appearance: none;
   width: 100px;
   background: transparent;
 }
