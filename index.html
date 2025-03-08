@@ -23,81 +23,80 @@
     button.weaponMod { background-color: #87CEEB; color: black; }
     button.weaponMod.on { background-color: #0000FF; color: white; }
     button.legendary.on { background-color: #FFA500; color: white; }
+    /* 言語切り替えボタン用のスタイル */
+    .language-switcher { text-align: right; padding: 10px; }
+    .language-switcher button { background-color: #4CAF50; color: white; }
+    .language-switcher button.active { background-color: #45a049; border: 2px solid #fff; }
   </style>
 </head>
 <body>
+  <!-- 言語切り替えボタンを追加 -->
+  <div class="language-switcher">
+    <button id="jp-btn" class="active" onclick="switchLanguage('jp')">日本語</button>
+    <button id="en-btn" onclick="switchLanguage('en')">English</button>
+  </div>
+  
   <div class="container">
     <div id="scrollable-content">
       <table>
         <thead>
-          <tr><th>通常ダメージ</th><td> ベース <input type="text" id="finalDamageTotal" readonly> FT <input type="text" id="ftDamage" readonly> TOFT <input type="text" id="toftDamage" readonly> ラスト <input type="text" id="lowHealthDamage" readonly> </td></tr>
-          <tr><th>クリティカル</th><td> ベース <input type="text" id="finalCriticalDamageTotal" readonly> FT <input type="text" id="ftCriticalDamage" readonly> TOFT <input type="text" id="toftCriticalDamage" readonly> ラスト <input type="text" id="lowHealthCriticalDamage" readonly> </td></tr>
+          <tr><th data-lang-key="normalDamage">通常ダメージ</th><td> <span data-lang-key="base">ベース</span> <input type="text" id="finalDamageTotal" readonly> FT <input type="text" id="ftDamage" readonly> TOFT <input type="text" id="toftDamage" readonly> <span data-lang-key="last">ラスト</span> <input type="text" id="lowHealthDamage" readonly> </td></tr>
+          <tr><th data-lang-key="criticalDamage">クリティカル</th><td> <span data-lang-key="base">ベース</span> <input type="text" id="finalCriticalDamageTotal" readonly> FT <input type="text" id="ftCriticalDamage" readonly> TOFT <input type="text" id="toftCriticalDamage" readonly> <span data-lang-key="last">ラスト</span> <input type="text" id="lowHealthCriticalDamage" readonly> </td></tr>
         </thead>
         <tbody>
-          <tr><th>プリセット</th><td><select id="presetSelect" onchange="applyPreset()"><option value="default">デフォルト</option><option value="preset1">プリセット1</option><option value="preset2">プリセット2</option></select></td></tr>
-          <tr><th>攻撃対象</th><td><button id="ultraciteTerrorButton" class="on" onclick="toggleExclusiveBonus('ultraciteTerror')">ウルトラサイトテラー</button><button id="en06Button" class="off" onclick="toggleExclusiveBonus('en06')">EN06</button></td></tr>
-          <tr><th>攻撃部位</th><td><button id="eyeButton" class="on" onclick="toggleExclusiveBonus('eye')">目</button><button id="headButton" class="off" onclick="toggleExclusiveBonus('head')">頭</button><button id="bodyButton" class="off" onclick="toggleExclusiveBonus('body')">胴体</button></td></tr>
+          <tr><th data-lang-key="preset">プリセット</th><td><select id="presetSelect" onchange="applyPreset()"><option value="default" data-lang-key="defaultPreset">デフォルト</option><option value="preset1" data-lang-key="preset1">プリセット1</option><option value="preset2" data-lang-key="preset2">プリセット2</option></select></td></tr>
+          <tr><th data-lang-key="target">攻撃対象</th><td><button id="ultraciteTerrorButton" class="on" onclick="toggleExclusiveBonus('ultraciteTerror')" data-lang-key="ultraciteTerror">ウルトラサイトテラー</button><button id="en06Button" class="off" onclick="toggleExclusiveBonus('en06')">EN06</button></td></tr>
+          <tr><th data-lang-key="bodyPart">攻撃部位</th><td><button id="eyeButton" class="on" onclick="toggleExclusiveBonus('eye')" data-lang-key="eye">目</button><button id="headButton" class="off" onclick="toggleExclusiveBonus('head')" data-lang-key="head">頭</button><button id="bodyButton" class="off" onclick="toggleExclusiveBonus('body')" data-lang-key="body">胴体</button></td></tr>
           <tr>
-            <th>武器</th>
+            <th data-lang-key="weapon">武器</th>
             <td>
-              <button id="gatPlasmaButton" class="on weapon" onclick="toggleWeapon('gatPlasma')">ガトプラ</button>
-              <button id="railRifleButton" class="off weapon" onclick="toggleWeapon('railRifle')">レールライフル</button>
+              <button id="gatPlasmaButton" class="on weapon" onclick="toggleWeapon('gatPlasma')" data-lang-key="gatPlasma">ガトプラ</button>
+              <button id="railRifleButton" class="off weapon" onclick="toggleWeapon('railRifle')" data-lang-key="railRifle">レールライフル</button>
             </td>
           </tr>
           <tr>
-            <th>武器MOD</th>
+            <th data-lang-key="weaponMod">武器MOD</th>
             <td>
               <span id="gatPlasmaMods" style="display: inline;">
-                <button id="stingingCoreButton" class="on weaponMod" onclick="toggleBonus('stingingCore')">スティングコア</button>
-                <button id="swiftCoreButton" class="off weaponMod" onclick="toggleExclusiveBonus('swiftCore')">スウィフトコア</button>
-                <button id="primeButton" class="off weaponMod" onclick="toggleExclusiveBonus('prime')">プライムレシーバー</button>
-                <button id="calibrateButton" class="on weaponMod" onclick="toggleExclusiveBonus('calibrate')">キャリブレートレシーバー</button>
-                <button id="acceralateButton" class="on weaponMod" onclick="toggleBonus('acceralate')">アクセラレートノズル</button>
+                <button id="stingingCoreButton" class="on weaponMod" onclick="toggleBonus('stingingCore')" data-lang-key="stingingCore">スティングコア</button>
+                <button id="swiftCoreButton" class="off weaponMod" onclick="toggleExclusiveBonus('swiftCore')" data-lang-key="swiftCore">スウィフトコア</button>
+                <button id="primeButton" class="off weaponMod" onclick="toggleExclusiveBonus('prime')" data-lang-key="prime">プライムレシーバー</button>
+                <button id="calibrateButton" class="on weaponMod" onclick="toggleExclusiveBonus('calibrate')" data-lang-key="calibrate">キャリブレートレシーバー</button>
+                <button id="acceralateButton" class="on weaponMod" onclick="toggleBonus('acceralate')" data-lang-key="acceralate">アクセラレートノズル</button>
               </span>
               <span id="railRifleMods" style="display: none;">
-                <button id="autoPistonButton" class="on weaponMod" onclick="toggleBonus('autoPiston')">オートピストン</button>
-                <button id="primeRailButton" class="off weaponMod" onclick="toggleExclusiveBonus('primeRail')">プライムレシーバー</button>
+                <button id="autoPistonButton" class="on weaponMod" onclick="toggleBonus('autoPiston')" data-lang-key="autoPiston">オートピストン</button>
+                <button id="primeRailButton" class="off weaponMod" onclick="toggleExclusiveBonus('primeRail')" data-lang-key="primeRail">プライムレシーバー</button>
               </span>
             </td>
           </tr>
-          <tr><th>★1伝説効果</th><td><button id="bloodiedButton" class="on" onclick="toggleExclusiveBonus('bloodied')">血濡れ</button><button id="antiArmorButton" class="off" onclick="toggleExclusiveBonus('antiArmor')">対アーマー</button><button id="excusionerButton" class="off" onclick="toggleExclusiveBonus('excusioner')">処刑人</button></td></tr>
-          <tr><th>★2伝説効果</th><td><button id="rapidButton" class="on" onclick="toggleExclusiveBonus('rapid')">迅速</button><button id="vitalButton" class="off" onclick="toggleExclusiveBonus('vital')">バイタル</button></td></tr>
+          <tr><th data-lang-key="legendary1">★1伝説効果</th><td><button id="bloodiedButton" class="on" onclick="toggleExclusiveBonus('bloodied')" data-lang-key="bloodied">血濡れ</button><button id="antiArmorButton" class="off" onclick="toggleExclusiveBonus('antiArmor')" data-lang-key="antiArmor">対アーマー</button><button id="excusionerButton" class="off" onclick="toggleExclusiveBonus('excusioner')" data-lang-key="excusioner">処刑人</button><button id="quadButton" class="off legendary" onclick="toggleExclusiveBonus('quad')" data-lang-key="quad">クアッド</button></td></tr>
+          <tr><th data-lang-key="legendary2">★2伝説効果</th><td><button id="rapidButton" class="on" onclick="toggleExclusiveBonus('rapid')" data-lang-key="rapid">迅速</button><button id="vitalButton" class="off" onclick="toggleExclusiveBonus('vital')" data-lang-key="vital">バイタル</button></td></tr>
           <tr>
-            <th>★3伝説効果</th>
+            <th data-lang-key="legendary3">★3伝説効果</th>
             <td>
               <button id="rangersButton" class="on" onclick="toggleBonus('rangers')">Ranger's</button>
               <button id="pinPointersButton" class="on" onclick="toggleBonus('pinPointers')">Pin-Pointer's</button>
-              <button id="reloadSpeedButton" class="off" onclick="toggleBonus('reloadSpeed')">リロ速</button>
+              <button id="reloadSpeedButton" class="off" onclick="toggleBonus('reloadSpeed')" data-lang-key="reloadSpeed">リロ速</button>
             </td>
           </tr>
-          <tr><th>総ダメージボーナス</th><td><input type="number" id="damageBonus" value="100" readonly> %</td></tr>
-          <tr><th>総クリティカルボーナス</th><td><input type="number" id="criticalBonus" value="100" readonly> %</td></tr>
-          <tr><th>ダメージ系Perk</th><td><button id="heavyGunnerButton" class="on" onclick="toggleBonus('heavyGunner')">HeavyGunner</button><button id="betterCriticalsButton" class="on" onclick="toggleBonus('betterCriticals')">Better Criticals</button><button id="bMessButton" class="on" onclick="toggleBonus('bMess')">Bloody Mess</button><button id="nerdRageButton" class="on" onclick="toggleBonus('nerdRage')">Nerd Rage</button></td></tr>
-          <tr><th>アーマー貫通系Perk</th><td><button id="stabilizedButton" class="on" onclick="toggleBonus('stabilized')">Stabilized</button></td></tr>
-          <tr><th>その他Perk</th><td><button id="sinButton" class="on" onclick="toggleBonus('sin')">Strange in Numbers</button><button id="perkMultiplierButton" class="on" onclick="toggleBonus('perkMultiplier')">Taking one for the Team</button><button id="followThroughButton" class="on" onclick="toggleBonus('followThrough')">Follow Through</button></td></tr>
-          <tr><th>変異</th><td><button id="eagleEyesButton" class="on" onclick="toggleBonus('eagleEyes')">ワシの目</button><button id="adrenalRButton" class="on" onclick="toggleBonus('adrenalR')">副腎反応</button></td></tr>
-          <tr><th>バフ系</th><td><button id="blightSoupButton" class="on" onclick="toggleBonus('blightSoup')">ブライトのスープ</button><button id="oDriveButton" class="on" onclick="toggleExclusiveBonus('oDrive')">オーバードライブ</button><button id="phyBuffButton" class="off" onclick="toggleExclusiveBonus('phyBuff')">サイコバフ</button><button id="heavyGunsButton" class="on" onclick="toggleBonus('heavyGuns')">HeavyGuns</button><button id="teslaScience9Button" class="off" onclick="toggleBonus('teslaScience9')">テスラサイエンス９</button></td></tr>
-          <tr><th>発射速度</th><td><input type="text" id="firingRate" readonly> 発/秒 </td></tr>
-          <tr>
-            <th>マガジンサイズ</th>
-            <td>
-              <select id="magazineSizeSelect" onchange="calculateDamage()">
-                <option value="gatPlasma375" selected>ガトプラ 375</option>
-                <option value="gatPlasma500">ガトプラ 500</option>
-                <option value="railRifle10">レールライフル 10</option>
-                <option value="railRifle40">レールライフル 40</option>
-              </select>
-            </td>
-          </tr>
+          <tr><th data-lang-key="totalDamageBonus">総ダメージボーナス</th><td><input type="number" id="damageBonus" value="100" readonly> %</td></tr>
+          <tr><th data-lang-key="totalCriticalBonus">総クリティカルボーナス</th><td><input type="number" id="criticalBonus" value="100" readonly> %</td></tr>
+          <tr><th data-lang-key="damagePerk">ダメージ系Perk</th><td><button id="heavyGunnerButton" class="on" onclick="toggleBonus('heavyGunner')">HeavyGunner</button><button id="betterCriticalsButton" class="on" onclick="toggleBonus('betterCriticals')">Better Criticals</button><button id="bMessButton" class="on" onclick="toggleBonus('bMess')">Bloody Mess</button><button id="nerdRageButton" class="on" onclick="toggleBonus('nerdRage')">Nerd Rage</button></td></tr>
+          <tr><th data-lang-key="armorPenPerk">アーマー貫通系Perk</th><td><button id="stabilizedButton" class="on" onclick="toggleBonus('stabilized')">Stabilized</button></td></tr>
+          <tr><th data-lang-key="otherPerk">その他Perk</th><td><button id="sinButton" class="on" onclick="toggleBonus('sin')">Strange in Numbers</button><button id="perkMultiplierButton" class="on" onclick="toggleBonus('perkMultiplier')">Taking one for the Team</button><button id="followThroughButton" class="on" onclick="toggleBonus('followThrough')">Follow Through</button></td></tr>
+          <tr><th data-lang-key="mutation">変異</th><td><button id="eagleEyesButton" class="on" onclick="toggleBonus('eagleEyes')" data-lang-key="eagleEyes">ワシの目</button><button id="adrenalRButton" class="on" onclick="toggleBonus('adrenalR')" data-lang-key="adrenalR">副腎反応</button></td></tr>
+          <tr><th data-lang-key="buff">バフ系</th><td><button id="blightSoupButton" class="on" onclick="toggleBonus('blightSoup')" data-lang-key="blightSoup">ブライトのスープ</button><button id="oDriveButton" class="on" onclick="toggleExclusiveBonus('oDrive')" data-lang-key="oDrive">オーバードライブ</button><button id="phyBuffButton" class="off" onclick="toggleExclusiveBonus('phyBuff')" data-lang-key="phyBuff">サイコバフ</button><button id="heavyGunsButton" class="on" onclick="toggleBonus('heavyGuns')" data-lang-key="heavyGuns">HeavyGuns</button><button id="teslaScience9Button" class="off" onclick="toggleBonus('teslaScience9')" data-lang-key="teslaScience9">テスラサイエンス９</button></td></tr>
+          <tr><th data-lang-key="firingRate">発射速度</th><td><input type="text" id="firingRate" readonly> <span data-lang-key="shotsPerSecond">発/秒</span></td></tr>
           <tr><th>DPS</th><td><input type="text" id="dps" readonly></td></tr>
-          <tr><th>討伐時間</th><td><input type="text" id="killTime" readonly> 秒</td></tr>
-          <tr><th>PipBoy表記ダメ（物理/エネルギー）</th><td><input type="text" id="gameDisplayDamagePhysical" readonly>/<input type="text" id="gameDisplayDamageEnergy" readonly></td></tr>
-          <tr><th>机上のダメージ（物理/エネルギー）</th><td><input type="text" id="damageOnPaperPhysical" readonly>/<input type="text" id="damageOnPaperEnergy" readonly></td></tr>
-          <tr><th>アーマー貫通後耐性（物理/エネルギー）</th><td><input type="text" id="enemyDamageResistancePhysicalAfterArmorPen" readonly>/<input type="text" id="enemyDamageResistanceEnergyAfterArmorPen" readonly></td></tr>
-          <tr><th>最終通常ダメージ(物理/エネルギー)</th><td><input type="text" id="finalDamagePhysical" readonly>/<input type="text" id="finalDamageEnergy" readonly></td></tr>
-          <tr><th>クリダメ加算（物理/エネルギー）</th><td><input type="text" id="criticalDamageAddPhysical" readonly>/<input type="text" id="criticalDamageAddEnergy" readonly></td></tr>
-          <tr><th>机上のクリダメ（物理/エネルギー）</th><td><input type="text" id="criticalDamagePaperPhysical" readonly>/<input type="text" id="criticalDamagePaperEnergy" readonly></td></tr>
-          <tr><th>最終クリダメ（物理/エネルギー）</th><td><input type="text" id="finalCriticalDamagePhysical" readonly>/<input type="text" id="finalCriticalDamageEnergy" readonly></td></tr>
+          <tr><th data-lang-key="killTime">討伐時間</th><td><input type="text" id="killTime" readonly> <span data-lang-key="seconds">秒</span></td></tr>
+          <tr><th data-lang-key="pipboyDamage">PipBoy表記ダメ（物理/エネルギー）</th><td><input type="text" id="gameDisplayDamagePhysical" readonly>/<input type="text" id="gameDisplayDamageEnergy" readonly></td></tr>
+          <tr><th data-lang-key="paperDamage">机上のダメージ（物理/エネルギー）</th><td><input type="text" id="damageOnPaperPhysical" readonly>/<input type="text" id="damageOnPaperEnergy" readonly></td></tr>
+          <tr><th data-lang-key="resistanceAfterArmorPen">アーマー貫通後耐性（物理/エネルギー）</th><td><input type="text" id="enemyDamageResistancePhysicalAfterArmorPen" readonly>/<input type="text" id="enemyDamageResistanceEnergyAfterArmorPen" readonly></td></tr>
+          <tr><th data-lang-key="finalNormalDamage">最終通常ダメージ(物理/エネルギー)</th><td><input type="text" id="finalDamagePhysical" readonly>/<input type="text" id="finalDamageEnergy" readonly></td></tr>
+          <tr><th data-lang-key="criticalDamageAdd">クリダメ加算（物理/エネルギー）</th><td><input type="text" id="criticalDamageAddPhysical" readonly>/<input type="text" id="criticalDamageAddEnergy" readonly></td></tr>
+          <tr><th data-lang-key="paperCriticalDamage">机上のクリダメ（物理/エネルギー）</th><td><input type="text" id="criticalDamagePaperPhysical" readonly>/<input type="text" id="criticalDamagePaperEnergy" readonly></td></tr>
+          <tr><th data-lang-key="finalCriticalDamage">最終クリダメ（物理/エネルギー）</th><td><input type="text" id="finalCriticalDamagePhysical" readonly>/<input type="text" id="finalCriticalDamageEnergy" readonly></td></tr>
         </tbody>
       </table>
     </div>
@@ -109,10 +108,256 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1/chartjs-plugin-annotation.min.js"></script>
   <script>
+    // 言語データを定義
+    const langData = {
+      jp: {
+        // ヘッダーとタイトル
+        normalDamage: "通常ダメージ",
+        criticalDamage: "クリティカル",
+        base: "ベース",
+        last: "ラスト",
+        
+        // プリセット
+        preset: "プリセット",
+        defaultPreset: "デフォルト",
+        preset1: "プリセット1",
+        preset2: "プリセット2",
+        
+        // 攻撃対象と部位
+        target: "攻撃対象",
+        ultraciteTerror: "ウルトラサイトテラー",
+        bodyPart: "攻撃部位",
+        eye: "目",
+        head: "頭",
+        body: "胴体",
+        
+        // 武器
+        weapon: "武器",
+        gatPlasma: "ガトプラ",
+        railRifle: "レールライフル",
+        
+        // 武器MOD
+        weaponMod: "武器MOD",
+        stingingCore: "スティングコア",
+        swiftCore: "スウィフトコア",
+        prime: "プライムレシーバー",
+        calibrate: "キャリブレートレシーバー",
+        acceralate: "アクセラレートノズル",
+        autoPiston: "オートピストン",
+        primeRail: "プライムレシーバー",
+        
+        // 伝説効果
+        legendary1: "★1伝説効果",
+        bloodied: "血濡れ",
+        antiArmor: "対アーマー",
+        excusioner: "処刑人",
+        quad: "クアッド",
+        legendary2: "★2伝説効果",
+        rapid: "迅速",
+        vital: "バイタル",
+        legendary3: "★3伝説効果",
+        reloadSpeed: "リロ速",
+        
+        // ボーナスと数値
+        totalDamageBonus: "総ダメージボーナス",
+        totalCriticalBonus: "総クリティカルボーナス",
+        
+        // パーク
+        damagePerk: "ダメージ系Perk",
+        armorPenPerk: "アーマー貫通系Perk",
+        otherPerk: "その他Perk",
+        
+        // 変異とバフ
+        mutation: "変異",
+        eagleEyes: "ワシの目",
+        adrenalR: "副腎反応",
+        buff: "バフ系",
+        blightSoup: "ブライトのスープ",
+        oDrive: "オーバードライブ",
+        phyBuff: "サイコバフ",
+        heavyGuns: "HeavyGuns",
+        teslaScience9: "テスラサイエンス９",
+        
+        // その他の数値と表示
+        firingRate: "発射速度",
+        shotsPerSecond: "発/秒",
+        killTime: "討伐時間",
+        seconds: "秒",
+        pipboyDamage: "PipBoy表記ダメ（物理/エネルギー）",
+        paperDamage: "机上のダメージ（物理/エネルギー）",
+        resistanceAfterArmorPen: "アーマー貫通後耐性（物理/エネルギー）",
+        finalNormalDamage: "最終通常ダメージ(物理/エネルギー)",
+        criticalDamageAdd: "クリダメ加算（物理/エネルギー）",
+        paperCriticalDamage: "机上のクリダメ（物理/エネルギー）",
+        finalCriticalDamage: "最終クリダメ（物理/エネルギー）",
+        
+        // グラフ関連
+        graphTime: "時間 (秒)",
+        graphCumulativeDamage: "累積ダメージ",
+        toftStart: "Taking one for the Team 開始",
+        excusionerThreshold: "処刑人 (40%)",
+        healthThreshold: "体力10%",
+        defeatTime: "討伐 ({0}秒)"
+      },
+      en: {
+        // Headers and titles
+        normalDamage: "Normal Damage",
+        criticalDamage: "Critical Damage",
+        base: "Base",
+        last: "Last",
+        
+        // Presets
+        preset: "Preset",
+        defaultPreset: "Default",
+        preset1: "Preset 1",
+        preset2: "Preset 2",
+        
+        // Attack target and body parts
+        target: "Target",
+        ultraciteTerror: "Ultracite Terror",
+        bodyPart: "Body Part",
+        eye: "Eye",
+        head: "Head",
+        body: "Body",
+        
+        // Weapons
+        weapon: "Weapon",
+        gatPlasma: "Gatling Plasma",
+        railRifle: "Rail Rifle",
+        
+        // Weapon mods
+        weaponMod: "Weapon Mods",
+        stingingCore: "Stinging Core",
+        swiftCore: "Swift Core",
+        prime: "Prime Receiver",
+        calibrate: "Calibrated Receiver",
+        acceralate: "Accelerated Nozzle",
+        autoPiston: "Auto Piston",
+        primeRail: "Prime Receiver",
+        
+        // Legendary effects
+        legendary1: "★1 Legendary Effect",
+        bloodied: "Bloodied",
+        antiArmor: "Anti-Armor",
+        excusioner: "Executioner's",
+        quad: "Quad",
+        legendary2: "★2 Legendary Effect",
+        rapid: "Rapid",
+        vital: "Vital",
+        legendary3: "★3 Legendary Effect",
+        reloadSpeed: "Faster Reload",
+        
+        // Bonuses and values
+        totalDamageBonus: "Total Damage Bonus",
+        totalCriticalBonus: "Total Critical Bonus",
+        
+        // Perks
+        damagePerk: "Damage Perks",
+        armorPenPerk: "Armor Penetration Perks",
+        otherPerk: "Other Perks",
+        
+        // Mutations and buffs
+        mutation: "Mutations",
+        eagleEyes: "Eagle Eyes",
+        adrenalR: "Adrenal Reaction",
+        buff: "Buffs",
+        blightSoup: "Blight Soup",
+        oDrive: "Overdrive",
+        phyBuff: "Psychobuff",
+        heavyGuns: "HeavyGuns",
+        teslaScience9: "Tesla Science 9",
+        
+        // Other values and displays
+        firingRate: "Firing Rate",
+        shotsPerSecond: "shots/sec",
+        killTime: "Kill Time",
+        seconds: "seconds",
+        pipboyDamage: "PipBoy Damage (Physical/Energy)",
+        paperDamage: "Paper Damage (Physical/Energy)",
+        resistanceAfterArmorPen: "Resistance After Armor Pen (Physical/Energy)",
+        finalNormalDamage: "Final Normal Damage (Physical/Energy)",
+        criticalDamageAdd: "Critical Damage Add (Physical/Energy)",
+        paperCriticalDamage: "Paper Critical Damage (Physical/Energy)",
+        finalCriticalDamage: "Final Critical Damage (Physical/Energy)",
+        
+        // Graph related
+        graphTime: "Time (seconds)",
+        graphCumulativeDamage: "Cumulative Damage",
+        toftStart: "Taking one for the Team Start",
+        excusionerThreshold: "Executioner's (40%)",
+        healthThreshold: "Health 10%",
+        defeatTime: "Defeat ({0}sec)"
+      }
+    };
+    
+    // 現在の言語（デフォルトは日本語）
+    let currentLang = 'jp';
+    
+    // 言語切り替え関数
+    function switchLanguage(lang) {
+      currentLang = lang;
+      
+      // ボタンのアクティブ状態を更新
+      document.getElementById('jp-btn').classList.toggle('active', lang === 'jp');
+      document.getElementById('en-btn').classList.toggle('active', lang === 'en');
+      
+      // すべての言語キーを持つ要素にテキストを適用
+      const elements = document.querySelectorAll('[data-lang-key]');
+      elements.forEach(el => {
+        const key = el.getAttribute('data-lang-key');
+        if (langData[lang][key]) {
+          // selectの場合はオプションも更新
+          if (el.tagName === 'SELECT') {
+            Array.from(el.options).forEach(option => {
+              const optionKey = option.getAttribute('data-lang-key');
+              if (optionKey && langData[lang][optionKey]) {
+                option.textContent = langData[lang][optionKey];
+              }
+            });
+          } else {
+            el.textContent = langData[lang][key];
+          }
+        }
+      });
+      
+      // グラフを更新（既に表示されている場合）
+      if (chart) {
+        updateChartLabels();
+      }
+    }
+    
+    // グラフのラベルを更新
+    function updateChartLabels() {
+      chart.options.scales.x.title.text = langData[currentLang].graphTime;
+      chart.options.scales.y.title.text = langData[currentLang].graphCumulativeDamage;
+      chart.data.datasets[0].label = langData[currentLang].graphCumulativeDamage;
+      
+      // アノテーションの更新
+      if (chart.options.plugins.annotation.annotations) {
+        chart.options.plugins.annotation.annotations.forEach(annotation => {
+          if (annotation.label && annotation.label.content) {
+            if (annotation.label.content.includes('Taking one for the Team')) {
+              annotation.label.content = langData[currentLang].toftStart;
+            } else if (annotation.label.content.includes('処刑人') || annotation.label.content.includes('Executioner')) {
+              annotation.label.content = langData[currentLang].excusionerThreshold;
+            } else if (annotation.label.content.includes('体力') || annotation.label.content.includes('Health')) {
+              annotation.label.content = langData[currentLang].healthThreshold;
+            } else if (annotation.label.content.includes('討伐') || annotation.label.content.includes('Defeat')) {
+              const time = annotation.label.content.match(/\d+(\.\d+)?/)[0];
+              annotation.label.content = langData[currentLang].defeatTime.replace('{0}', time);
+            }
+          }
+        });
+      }
+      
+      chart.update();
+    }
+
     const BASE_DAMAGE_BONUS = 1;
     let state = {
       bMessActive: true, primeActive: false, calibrateActive: true, adrenalRActive: true,
-      bloodiedActive: true, antiArmorActive: false, excusionerActive: false, blightSoupActive: true,
+      bloodiedActive: true, antiArmorActive: false, excusionerActive: false, quadActive: false,
+      blightSoupActive: true,
       heavyGunsActive: true, teslaScience9Active: false, oDriveActive: true, phyBuffActive: false,
       perkMultiplierActive: true, followThroughActive: true, stabilizedActive: false, stingingCoreActive: true,
       pinPointersActive: true, acceralateActive: true, rapidActive: true, vitalActive: false,
@@ -146,12 +391,12 @@
     const weaponData = {
       gatPlasma: {
         damages: { physical: 35, energy: 35 },
-        magazineSizes: [375, 500],
+        defaultMagazineSize: 500,
         baseReloadTime: 5
       },
       railRifle: {
         damages: { physical: 90, energy: 0 },
-        magazineSizes: [10, 40],
+        defaultMagazineSize: 10,
         baseReloadTime: 2
       }
     };
@@ -185,9 +430,10 @@
         calibrate: ["prime", "swiftCore"],
         swiftCore: ["prime", "calibrate"],
         oDrive: ["phyBuff"],
-        bloodied: ["antiArmor", "excusioner"],
-        antiArmor: ["bloodied", "excusioner"],
-        excusioner: ["bloodied", "antiArmor"],
+        bloodied: ["antiArmor", "excusioner", "quad"],
+        antiArmor: ["bloodied", "excusioner", "quad"],
+        excusioner: ["bloodied", "antiArmor", "quad"],
+        quad: ["bloodied", "antiArmor", "excusioner"],
         phyBuff: ["oDrive"],
         ultraciteTerror: ["en06"],
         en06: ["ultraciteTerror"],
@@ -218,7 +464,7 @@
         if (button) {
           button.classList.remove("on", "off");
           button.classList.add(state[key] ? "on" : "off");
-          if (["bloodied", "antiArmor", "excusioner", "rapid", "vital", "rangers", "pinPointers"].includes(key.replace("Active", ""))) {
+          if (["bloodied", "antiArmor", "excusioner", "quad", "rapid", "vital", "rangers", "pinPointers"].includes(key.replace("Active", ""))) {
             button.classList.add("legendary");
           }
         }
@@ -258,10 +504,12 @@
       const enemyType = state.ultraciteTerrorActive ? "ultraciteTerror" : "en06";
       const bodyPart = state.eyeActive ? "eye" : state.headActive ? "head" : "body";
       const weapon = state.gatPlasmaActive ? "gatPlasma" : "railRifle";
-      const magazineSizeSelect = document.getElementById("magazineSizeSelect").value;
-      const isGatPlasma = weapon === "gatPlasma";
-      const magazineSize = magazineSizeSelect === (isGatPlasma ? "gatPlasma500" : "railRifle40") ?
-        weaponData[weapon].magazineSizes[1] : weaponData[weapon].magazineSizes[0];
+      
+      let magazineSize = weaponData[weapon].defaultMagazineSize;
+      
+      if (state.quadActive) {
+        magazineSize *= 4;
+      }
 
       const inputs = {
         weaponBaseDamagePhysical: weaponData[weapon].damages.physical,
@@ -353,7 +601,7 @@
       document.getElementById("finalCriticalDamageEnergy").value = Math.round(finalCriticalDamage.energy);
       document.getElementById("finalCriticalDamageTotal").value = Math.round(totals.finalCriticalDamage);
 
-      let firingRate = isGatPlasma ? 91 * (1 + 0.25 * (state.acceralateActive ? 1 : 0) + 0.25 * (state.rapidActive ? 1 : 0)) : 20;
+      let firingRate = weapon === "gatPlasma" ? 91 * (1 + 0.25 * (state.acceralateActive ? 1 : 0) + 0.25 * (state.rapidActive ? 1 : 0)) : 20;
       const firingRatePerSecond = firingRate / 10;
       document.getElementById("firingRate").value = firingRatePerSecond.toFixed(1);
 
@@ -362,7 +610,7 @@
       document.getElementById("dps").value = Math.round(dps);
 
       let reloadSpeedMultiplier = state.reloadSpeedActive ? 1.5 : 1;
-      if (isGatPlasma && state.swiftCoreActive) reloadSpeedMultiplier *= 1.5;
+      if (weapon === "gatPlasma" && state.swiftCoreActive) reloadSpeedMultiplier *= 1.5;
       const reloadTime = weaponData[weapon].baseReloadTime / reloadSpeedMultiplier;
 
       const ftMultiplier = 1.4;
@@ -511,7 +759,7 @@
         data: {
           labels: times,
           datasets: [{
-            label: "累積ダメージ",
+            label: langData[currentLang].graphCumulativeDamage,
             data: dataPoints,
             borderColor: "blue",
             fill: false,
@@ -521,8 +769,27 @@
         options: {
           animation: { duration: 0 },
           scales: {
-            x: { type: 'linear', min: 0, max: 60, title: { display: true, text: "時間 (秒)", font: { size: 16 } }, ticks: { stepSize: 10, font: { size: 14 } } },
-            y: { title: { display: true, text: "累積ダメージ", font: { size: 16 } }, max: bossMaxHealth, beginAtZero: true, ticks: { font: { size: 14 } } }
+            x: { 
+              type: 'linear', 
+              min: 0, 
+              max: 60, 
+              title: { 
+                display: true, 
+                text: langData[currentLang].graphTime, 
+                font: { size: 16 } 
+              }, 
+              ticks: { stepSize: 10, font: { size: 14 } } 
+            },
+            y: { 
+              title: { 
+                display: true, 
+                text: langData[currentLang].graphCumulativeDamage, 
+                font: { size: 16 } 
+              }, 
+              max: bossMaxHealth, 
+              beginAtZero: true, 
+              ticks: { font: { size: 14 } } 
+            }
           },
           plugins: {
             annotation: { annotations },
@@ -534,6 +801,9 @@
     }
 
     window.onload = function() {
+      // 初期言語を適用
+      switchLanguage(currentLang);
+      
       updateButtons();
       calculateDamage();
     };
